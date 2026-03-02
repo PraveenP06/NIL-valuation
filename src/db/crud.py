@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
 from connection import get_client
 from models import Player, PlayerCreate
 from typing import List, Optional
