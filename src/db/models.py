@@ -7,6 +7,7 @@ class PlayerBase(BaseModel):
     position: Optional[str] = None
     school: Optional[str] = None
     conference: Optional[str] = None
+    season: Optional[int] = None
     recruiting_rating: Optional[float] = None
     recruiting_stars: Optional[int] = None
 
@@ -14,6 +15,30 @@ class PlayerCreate(PlayerBase):
     pass
 
 class Player(PlayerBase):
+    id: int
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class PerformanceStatsBase(BaseModel):
+    player_id: int
+    season: int
+    player_name: Optional[str] = None
+    school: Optional[str] = None
+    total_yards: Optional[float] = None
+    touchdowns: Optional[int] = None
+    attempts: Optional[int] = None
+    yards_per_game: Optional[float] = None
+    usage_share: Optional[float] = None
+    team_wins: Optional[int] = None
+    efficiency_metric: Optional[float] = None
+
+class PerformanceStatsCreate(PerformanceStatsBase):
+    pass
+
+class PerformanceStats(PerformanceStatsBase):
     id: int
     created_at: Optional[datetime] = None
 

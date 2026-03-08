@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 from db.crud import create_player
 from db.models import PlayerCreate
+from db.connection import get_client
 
 load_dotenv()
 
@@ -47,7 +48,9 @@ def ingest_year(year):
     print(f"🏈 Found {len(power4_teams)} Power 4 teams for {year}")
     print("⏳ Starting ingestion...\n")
     
+    client = get_client()
     players_added = 0
+    players_updated = 0
     players_failed = 0
 
     for team in tqdm(power4_teams, desc="Ingesting teams", unit="team"):
@@ -56,13 +59,17 @@ def ingest_year(year):
 
             for player in roster:
                 try:
-                    new_player = PlayerCreate(
-                        name=player.get("firstName", "") + " " + player.get("lastName", ""),
-                        position=player.get("position"),
-                        school=team.get("school"),
-                        conference=team.get("conference")
-                    )
-                    create_player(new_player)
+                    player_data = {
+                        "name": (player.get("firstName", "") + " " + player.get("lastName", "")).strip(),
+                        "position": player.get("position"),
+                        "school": team.get("school"),
+                        "conference": team.get("conference"),
+                        "season": year,
+                    }
+                    # Upsert: if (name, school, season) already exists, update
+                    result = client.table("players").upsert(
+                        player_data, on_conflict="name,school,season"
+                    ).execute()
                     players_added += 1
                 except Exception as e:
                     players_failed += 1
@@ -70,8 +77,12 @@ def ingest_year(year):
             print(f"\n⚠️  Error fetching roster for {team['school']}: {e}")
 
     print(f"\n✅ {year} ingestion complete!")
-    print(f"  ✓ Added: {players_added} players")
+    print(f"  ✓ Upserted: {players_added} players")
     print(f"  ✗ Failed: {players_failed} players")
 
 if __name__ == "__main__":
-    ingest_year(2023)
+    import argparse
+    parser = argparse.ArgumentParser(description="Ingest CFB player rosters into Supabase")
+    parser.add_argument("--year", type=int, default=2023, help="Season year to ingest")
+    args = parser.parse_args()
+    ingest_year(args.year)
