@@ -3,6 +3,7 @@ import sys
 import requests
 import argparse
 import re
+import time
 from collections import defaultdict
 from dotenv import load_dotenv
 from tqdm import tqdm
@@ -40,16 +41,29 @@ def normalize_player_name(name: str) -> str:
     tokens = [t for t in cleaned.split(" ") if t not in {"jr", "sr", "ii", "iii", "iv", "v"}]
     return " ".join(tokens)
 
-def get_player_stats(year):
-    """Fetch player statistics from CFB API"""
+def get_player_stats(year, max_retries=5, timeout=45):
+    """Fetch player statistics from CFB API with retry for transient network errors"""
     url = f"{BASE_URL}/stats/player/season"
     params = {"year": year}
-    response = requests.get(url, headers=headers, params=params)
-    if response.status_code != 200:
-        print(f"API Error: {response.status_code}")
-        print(f"Response: {response.text[:500]}")
-        raise Exception(f"API returned {response.status_code}")
-    return response.json()
+
+    last_error = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.get(url, headers=headers, params=params, timeout=timeout)
+            if response.status_code != 200:
+                print(f"API Error: {response.status_code}")
+                print(f"Response: {response.text[:500]}")
+                raise Exception(f"API returned {response.status_code}")
+            return response.json()
+        except requests.exceptions.RequestException as error:
+            last_error = error
+            if attempt == max_retries:
+                break
+            wait_seconds = min(2 ** attempt, 20)
+            print(f"⚠️  Request failed (attempt {attempt}/{max_retries}). Retrying in {wait_seconds}s...")
+            time.sleep(wait_seconds)
+
+    raise Exception(f"Failed after {max_retries} attempts: {last_error}")
 
 def ingest_performance_stats(year, max_rows=None):
     """Ingest performance stats for all players in database"""
@@ -100,7 +114,8 @@ def ingest_performance_stats(year, max_rows=None):
                 "games_played": 0,
             }
 
-        stat_type = (row.get("statType") or "").upper()
+        stat_type = (row.get("statType") or "").upper().strip()
+        category = (row.get("category") or "").lower()  # e.g. "passing", "rushing", "receiving"
         stat_value_raw = row.get("stat")
         try:
             stat_value = float(stat_value_raw)
@@ -108,11 +123,13 @@ def ingest_performance_stats(year, max_rows=None):
             stat_value = 0.0
 
         entry = aggregated[key]
-        if stat_type in {"YDS", "PASS_YDS", "RUSH_YDS", "REC_YDS", "TOT_YDS"}:
+        # Only count offensive categories
+        offensive = category in {"passing", "rushing", "receiving"}
+        if stat_type == "YDS" and offensive:
             entry["total_yards"] += stat_value
-        elif stat_type in {"TD", "PASS_TD", "RUSH_TD", "REC_TD", "TOT_TD"}:
+        elif stat_type == "TD" and offensive:
             entry["touchdowns"] += int(stat_value)
-        elif stat_type in {"ATT", "PASS_ATT", "RUSH_ATT"}:
+        elif stat_type in {"ATT", "CAR", "COMPLETIONS"} and offensive:
             entry["attempts"] += int(stat_value)
         elif stat_type in {"G", "GP", "GAMES"}:
             entry["games_played"] = max(entry["games_played"], int(stat_value))
@@ -145,6 +162,11 @@ def ingest_performance_stats(year, max_rows=None):
             total_tds = data["touchdowns"]
             total_attempts = data["attempts"]
             games_played = data["games_played"]
+
+            # Skip players with no meaningful offensive stats
+            if total_yards == 0 and total_tds == 0 and total_attempts == 0:
+                unmatched += 1
+                continue
 
             yards_per_game = (total_yards / games_played) if games_played > 0 else None
             efficiency_metric = (total_yards / total_attempts) if total_attempts > 0 else None
