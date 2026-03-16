@@ -22,6 +22,29 @@ class Player(PlayerBase):
         from_attributes = True
 
 
+class SocialMediaBase(BaseModel):
+    player_id: int
+    player_name: Optional[str] = None
+    instagram_followers: Optional[int] = None
+    twitter_followers: Optional[int] = None
+    total_followers: Optional[int] = None      # instagram + twitter
+    engagement_rate: Optional[float] = None    # (likes+comments) / followers, as %
+    avg_post_likes: Optional[int] = None
+    verified_instagram: Optional[bool] = None
+    verified_twitter: Optional[bool] = None
+    last_updated: Optional[datetime] = None
+
+class SocialMediaCreate(SocialMediaBase):
+    pass
+
+class SocialMedia(SocialMediaBase):
+    id: int
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
 class PerformanceStatsBase(BaseModel):
     player_id: int
     season: int
