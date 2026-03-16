@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from connection import get_client
-from models import Player, PlayerCreate, PerformanceStats, PerformanceStatsCreate
+from models import Player, PlayerCreate, PerformanceStats, PerformanceStatsCreate, SocialMedia, SocialMediaCreate
 from typing import List, Optional
 
 client = get_client()
@@ -123,5 +123,35 @@ def delete_performance_stats(stats_id: int) -> bool:
 def get_top_performers_by_season(season: int, metric: str = "total_yards", limit: int = 10) -> List[PerformanceStats]:
     """Fetch top performers for a specific season by a given metric"""
     response = client.table("performance_stats").select("*").eq("season", season).order(metric, desc=True).limit(limit).execute()
-    
+
     return [PerformanceStats(**stat) for stat in response.data] if response.data else []
+
+
+# ============================================================================
+# SOCIAL MEDIA CRUD OPERATIONS
+# ============================================================================
+
+def upsert_social_media(social: SocialMediaCreate) -> SocialMedia:
+    """Insert or update social media data for a player (unique on player_id)"""
+    data = social.dict()
+    response = client.table("social_media").upsert(data, on_conflict="player_id").execute()
+    if response.data:
+        return SocialMedia(**response.data[0])
+    raise Exception("Failed to upsert social media data")
+
+def get_social_media(player_id: int) -> Optional[SocialMedia]:
+    """Fetch social media data for a player"""
+    response = client.table("social_media").select("*").eq("player_id", player_id).execute()
+    if response.data:
+        return SocialMedia(**response.data[0])
+    return None
+
+def get_top_social_by_followers(limit: int = 10) -> List[SocialMedia]:
+    """Fetch players ranked by total followers"""
+    response = client.table("social_media").select("*").order("total_followers", desc=True).limit(limit).execute()
+    return [SocialMedia(**row) for row in response.data] if response.data else []
+
+def delete_social_media(player_id: int) -> bool:
+    """Delete social media data for a player"""
+    response = client.table("social_media").delete().eq("player_id", player_id).execute()
+    return len(response.data) > 0 if response.data else True
