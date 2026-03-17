@@ -64,7 +64,7 @@ def ingest_csv(filepath: str):
     client = get_client()
     now = datetime.now(timezone.utc).isoformat()
 
-    added = skipped = failed = 0
+    added = failed = 0
 
     with open(filepath, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -112,7 +112,6 @@ def ingest_csv(filepath: str):
 
     print(f"\n✅ Done!")
     print(f"  ✓ Upserted: {added}")
-    print(f"  ↷ Skipped:  {skipped}")
     print(f"  ✗ Failed:   {failed}")
 
 
