@@ -243,11 +243,11 @@ def main():
     if os.path.exists(ON3_PATH):
         with open(ON3_PATH) as f:
             on3_raw = json.load(f)
-        # Filter out high school names that leaked into the scrape
+        # Filter out noise: missing name or HS keywords — keep rows with missing nil_value
+        # so the rank-based extrapolation step can fill them in
         on3_raw = [
             p for p in on3_raw
-            if p.get("nil_value")
-            and p.get("name")
+            if p.get("name")
             and not any(kw in (p.get("name") or "").lower() for kw in HS_KEYWORDS)
         ]
         print(f"Loaded {len(on3_raw)} clean On3 players from scrape")
@@ -261,13 +261,20 @@ def main():
             suppl = json.load(f)
         print(f"Loaded {len(suppl)} players from nil_supplement.json")
 
-    # Merge: supplement takes priority over scrape for same player name
-    seen_names = {_norm(p.get("name", "")): p for p in suppl}
-    for p in on3_raw:
+    # Merge: supplement takes priority over scrape.
+    # Key = (norm_name, norm_school) when school is present, else (norm_name, "")
+    # to avoid dropping distinct players who share a name at different schools.
+    def _dedup_key(p: dict) -> tuple:
         n = _norm(p.get("name", ""))
-        if n not in seen_names:
-            seen_names[n] = p
-    on3_raw = list(seen_names.values())
+        s = _norm(p.get("school", "") or "")
+        return (n, s) if s else (n, "")
+
+    seen_keys: dict[tuple, dict] = {_dedup_key(p): p for p in suppl}
+    for p in on3_raw:
+        k = _dedup_key(p)
+        if k not in seen_keys:
+            seen_keys[k] = p
+    on3_raw = list(seen_keys.values())
     print(f"Combined unique labeled players: {len(on3_raw)}")
 
     labeled = [p for p in on3_raw if p.get("nil_value")]
