@@ -67,3 +67,24 @@ class PerformanceStats(PerformanceStatsBase):
 
     class Config:
         from_attributes = True
+
+
+class ValuationBase(BaseModel):
+    player_id: int
+    season: int
+    nil_value: float
+    perf_score: Optional[float] = None
+    social_score: Optional[float] = None
+    school_score: Optional[float] = None
+    position_mult: Optional[float] = None
+    conference_mult: Optional[float] = None
+
+class ValuationCreate(ValuationBase):
+    pass
+
+class Valuation(ValuationBase):
+    id: int
+    computed_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

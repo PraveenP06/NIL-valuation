@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from connection import get_client
-from models import Player, PlayerCreate, PerformanceStats, PerformanceStatsCreate, SocialMedia, SocialMediaCreate
+from models import Player, PlayerCreate, PerformanceStats, PerformanceStatsCreate, SocialMedia, SocialMediaCreate, Valuation, ValuationCreate
 from typing import List, Optional
 
 client = get_client()
@@ -155,3 +155,73 @@ def delete_social_media(player_id: int) -> bool:
     """Delete social media data for a player"""
     response = client.table("social_media").delete().eq("player_id", player_id).execute()
     return len(response.data) > 0 if response.data else True
+
+def get_all_social_media() -> list[SocialMedia]:
+    """Fetch all social media rows (paginated)."""
+    page_size = 1000
+    start = 0
+    all_rows = []
+    while True:
+        batch = client.table("social_media").select("*").range(start, start + page_size - 1).execute().data or []
+        all_rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        start += page_size
+    return [SocialMedia(**row) for row in all_rows]
+
+def get_all_performance_stats_by_season(season: int) -> list[PerformanceStats]:
+    """Fetch all performance stats for a season (paginated)."""
+    page_size = 1000
+    start = 0
+    all_rows = []
+    while True:
+        batch = (
+            client.table("performance_stats")
+            .select("*")
+            .eq("season", season)
+            .range(start, start + page_size - 1)
+            .execute()
+            .data or []
+        )
+        all_rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        start += page_size
+    return [PerformanceStats(**row) for row in all_rows]
+
+
+# ============================================================================
+# VALUATION CRUD OPERATIONS
+# ============================================================================
+
+def upsert_valuation(v: ValuationCreate) -> dict:
+    """Insert or update a valuation row (unique on player_id, season)."""
+    data = v.dict()
+    response = client.table("valuations").upsert(data, on_conflict="player_id,season").execute()
+    if response.data:
+        return response.data[0]
+    raise Exception("Failed to upsert valuation")
+
+def get_valuation(player_id: int, season: int) -> dict | None:
+    """Fetch a valuation for a player/season."""
+    response = (
+        client.table("valuations")
+        .select("*")
+        .eq("player_id", player_id)
+        .eq("season", season)
+        .limit(1)
+        .execute()
+    )
+    return response.data[0] if response.data else None
+
+def get_top_valuations(season: int, limit: int = 100) -> list[dict]:
+    """Fetch top valuations for a season ordered by nil_value DESC."""
+    response = (
+        client.table("valuations")
+        .select("*")
+        .eq("season", season)
+        .order("nil_value", desc=True)
+        .limit(limit)
+        .execute()
+    )
+    return response.data or []
