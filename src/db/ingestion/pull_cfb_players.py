@@ -1,7 +1,6 @@
 import os
 import sys
 import requests
-import pandas as pd
 from dotenv import load_dotenv
 from tqdm import tqdm
 #THIS FILE IS FOR INGESTING CFB PLAYERS FROM COLLEGE FOOTBALL DATA API INTO THE DATABASE
@@ -9,8 +8,6 @@ from tqdm import tqdm
 # Add parent directories to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from db.crud import create_player
-from db.models import PlayerCreate
 from db.connection import get_client
 
 load_dotenv()

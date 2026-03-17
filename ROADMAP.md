@@ -2,41 +2,30 @@
 
 ## PHASE 1: Data Foundation (COMPLETED ✅)
 - [x] Set up Supabase database
-- [x] Create players table with 1,000 Power 4 roster data
-- [x] Create performance_stats table with 511 player records
+- [x] Create players table with ~15,000 Power 4 roster records
+- [x] Create performance_stats table with ~3,100 player records
 - [x] Build CRUD operations for data management
 - [x] Set up data ingestion pipelines
 
-## PHASE 2: Enhanced Data Collection (IN PROGRESS)
+## PHASE 2: Enhanced Data Collection (MOSTLY DONE ✅)
 ### 2.1 Social Media Metrics
-- [ ] Create social_media_stats table
-  - player_id, platform (twitter/instagram/tiktok)
-  - followers, engagement_rate, posts_count
-  - updated_at timestamp
-- [ ] Build social media ingestion script
-  - Twitter API integration (using tweepy or similar)
-  - Instagram API integration
-  - TikTok API integration (if available)
-- [ ] Create CRUD functions for social media data
+- [x] Create social_media table (player_id, instagram_followers, twitter_followers, total_followers, engagement_rate, avg_post_likes, verified_instagram, verified_twitter)
+- [x] Build Instagram ingestion script (pull_social_media.py, pull_social_media_apify.py)
+- [x] Create CRUD functions for social media data
+- [ ] ~~Twitter API integration~~ — deferred, Instagram-only for MVP
+- [ ] ~~TikTok API integration~~ — deferred, possibly added later
 
 ### 2.2 Team/School Metrics
-- [ ] Create team_stats table
-  - team_name, conference, year
-  - wins, losses, ranking, tv_appearances
-  - recruiting_class_rank, facilities_rating
+- [ ] Create team_stats table (wins, losses, ranking, tv_appearances, recruiting_class_rank)
 - [ ] Ingest team data from CFB API
 - [ ] Link players to team performance data
 
 ### 2.3 Historical NIL Data
-- [ ] Create nil_market_data table
-  - player_name, school, position, year
-  - reported_nil_value, deal_count
-  - major_deals (endorsements, sponsorships)
-- [ ] Research and manually add historical NIL values
-  - ESPN data, Opendorse leaderboards, media reports
+- [ ] Create nil_market_data table (reported_nil_value, deal_count, major deals)
+- [ ] Research and manually add historical NIL values (ESPN, Opendorse, media reports)
 - [ ] Create nil_history CRUD operations
 
-## PHASE 3: Valuation Model (Core Business Logic)
+## PHASE 3: Valuation Model (COMPLETED ✅)
 ### 3.1 Define Valuation Factors & Weights
 ```python
 VALUATION_FACTORS = {
@@ -49,13 +38,14 @@ VALUATION_FACTORS = {
 ```
 
 ### 3.2 Build Valuation Engine
-- [ ] Create valuation.py module with functions:
-  - `calculate_performance_score()` - normalize stats
-  - `calculate_social_score()` - normalize follower counts
-  - `calculate_school_score()` - school brand value
-  - `get_position_multiplier()` - position-based adjustments
-  - `get_conference_multiplier()` - conference value
-  - `estimate_nil_value()` - final valuation formula
+- [x] `calculate_performance_score()` — normalizes stats (yards, TDs, efficiency, yards/game, team wins)
+- [x] `calculate_social_score()` — log-scale follower normalization + engagement/verification bonuses
+- [x] `calculate_school_score()` — tiered school prestige (Tier 1: 95, Tier 2: 75, fallback by conference)
+- [x] `get_position_multiplier()` — QB=1.5x down to K/P=0.7x
+- [x] `get_conference_multiplier()` — SEC=1.3x down to 0.8x default
+- [x] `estimate_nil_value()` — full weighted composite formula
+- [x] `valuations` table + CRUD (upsert_valuation, get_valuation, get_top_valuations)
+- [x] Batch valuation script (run_valuation.py)
 
 ### 3.3 Valuation Formula
 ```
@@ -63,32 +53,31 @@ NIL_VALUE = (
     (perf_score * 0.30) +
     (social_score * 0.25) +
     (school_score * 0.20) +
-    (position_multiplier * 0.15) +
-    (conference_multiplier * 0.10)
+    (position_score * 0.15) +
+    (conference_score * 0.10)
 ) * BASE_VALUE
 ```
 
 ## PHASE 4: API & Backend (Expose to Users)
 ### 4.1 Create REST API Endpoints
-- [ ] `/api/players` - List all players
-- [ ] `/api/players/{id}` - Get player details
-- [ ] `/api/players/{id}/valuation` - Get player's NIL valuation
-- [ ] `/api/top-valuations` - Top 10/50/100 valued players
-- [ ] `/api/compare` - Compare 2+ players
-- [ ] `/api/school/{school}` - Top players by school
-- [ ] `/api/position/{position}` - Top players by position
-- [ ] `/api/search` - Search players by name/school
+- [ ] `/api/players` — List all players
+- [ ] `/api/players/{id}` — Get player details
+- [ ] `/api/players/{id}/valuation` — Get player's NIL valuation
+- [ ] `/api/top-valuations` — Top 10/50/100 valued players
+- [ ] `/api/compare` — Compare 2+ players
+- [ ] `/api/school/{school}` — Top players by school
+- [ ] `/api/position/{position}` — Top players by position
+- [ ] `/api/search` — Search players by name/school
 
-### 4.2 Build with FastAPI (or Flask)
-- [ ] Install FastAPI, Pydantic, uvicorn
-- [ ] Create api/ directory with route files
-- [ ] Implement authentication (if needed)
+### 4.2 Build with FastAPI
+- [ ] Install FastAPI, uvicorn
+- [ ] Create src/api/ directory with route files
 - [ ] Add error handling & validation
-- [ ] Create comprehensive API documentation
+- [ ] Create API documentation (auto-generated via FastAPI)
 
 ## PHASE 5: Frontend (Visualization)
 ### 5.1 Web Dashboard
-- [ ] Build with React or Next.js
+- [ ] Build with Next.js
 - [ ] Player search/filter page
 - [ ] Player detail page with valuation breakdown
 - [ ] Leaderboard/ranking page
@@ -108,7 +97,7 @@ NIL_VALUE = (
 - [ ] Predict future valuations (ML model)
 - [ ] Market trends report
 
-### 6.2 Machine Learning (Optional)
+### 6.2 Machine Learning (Optional — post-MVP)
 - [ ] Train model on historical NIL data
 - [ ] Predict future NIL values
 - [ ] Identify emerging talent
@@ -119,29 +108,27 @@ NIL_VALUE = (
 - [ ] Compare to benchmarks
 
 ## PHASE 7: Deployment & Scaling
-- [ ] Deploy API to cloud (AWS, Heroku, Railway)
-- [ ] Deploy frontend (Vercel, Netlify)
+- [ ] Deploy API to cloud (Railway or Render recommended)
+- [ ] Deploy frontend (Vercel)
 - [ ] Set up CI/CD pipeline
 - [ ] Database backups & monitoring
 - [ ] Performance optimization
 
 ---
 
-## IMMEDIATE NEXT STEPS (This Week)
-1. **Choose first data source** - Social media or historical NIL data?
-2. **Build corresponding table** - Add to database schema
-3. **Create ingestion script** - Pull data from API/sources
-4. **Build valuation model** - Define weights and formula
-5. **Create valuation API** - First endpoint for testing
+## MVP PLAN (Instagram-only social data)
+Goal: get a working valuation model with real outputs before expanding data sources.
+
+1. ✅ Performance stats ingested (2023 season)
+2. ✅ Instagram followers ingested via Apify
+3. ✅ Valuation model built and batch script working
+4. **Next:** Build FastAPI layer (Phase 4) to expose valuations via endpoints
+5. **Then:** Simple frontend leaderboard (Phase 5)
+6. **Later:** Add Twitter, TikTok, team stats, historical NIL data
 
 ## Current Tech Stack
 - Database: Supabase (PostgreSQL)
-- Backend: Python (Flask/FastAPI ready)
-- Data Ingestion: CFB API, (need: Twitter, Instagram, etc.)
-- Frontend: (To be chosen - React/Next.js recommended)
-
-## Questions to Answer First
-1. Do you want to start with social media data or historical NIL data?
-2. What's your primary valuation metric - performance or popularity?
-3. Do you have access to historical NIL values?
-4. What's your timeline for MVP (Minimum Viable Product)?
+- Backend: Python + FastAPI (ready to build)
+- Data Ingestion: CFB API, Apify (Instagram)
+- Valuation: src/valuation/model.py
+- Frontend: Next.js (to be built)
