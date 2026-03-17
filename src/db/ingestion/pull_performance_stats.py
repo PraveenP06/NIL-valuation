@@ -135,10 +135,7 @@ def ingest_performance_stats(year, max_rows=None):
             entry["games_played"] = max(entry["games_played"], int(stat_value))
 
     print(f"🔎 Aggregated into {len(aggregated)} player-team stat profiles")
-    
-    stats_added = 0
-    stats_failed = 0
-    
+
     # Match aggregated stats to players in database
     stats_added = 0
     stats_updated = 0
