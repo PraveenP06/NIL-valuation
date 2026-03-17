@@ -1,0 +1,23 @@
+[
+  {"name": "Arch Manning",        "school": "Texas",          "position": "QB", "on3_rank": 1,  "nil_value": 5400000, "source": "on3_actual"},
+  {"name": "Jeremiah Smith",      "school": "Ohio State",     "position": "WR", "on3_rank": 2,  "nil_value": 4200000, "source": "on3_actual"},
+  {"name": "Sam Leavitt",         "school": "LSU",            "position": "QB", "on3_rank": 3,  "nil_value": 4000000, "source": "on3_actual"},
+  {"name": "Brendan Sorsby",      "school": "Texas Tech",     "position": "QB", "on3_rank": 4,  "nil_value": 3100000, "source": "on3_actual"},
+  {"name": "Bryce Underwood",     "school": "Michigan",       "position": "QB", "on3_rank": 5,  "nil_value": 3100000, "source": "on3_actual"},
+  {"name": "Cam Ward",            "school": "Miami",          "position": "QB", "on3_rank": 6,  "nil_value": 3000000, "source": "on3_actual"},
+  {"name": "Cam Coleman",         "school": "Ole Miss",       "position": "WR", "on3_rank": 7,  "nil_value": 2900000, "source": "on3_actual"},
+  {"name": "Ryan Williams",       "school": "Alabama",        "position": "WR", "on3_rank": 23, "nil_value": 1600000, "source": "on3_actual"},
+  {"name": "Evan Stewart",        "school": "Oregon",         "position": "WR", "on3_rank": 26, "nil_value": 1500000, "source": "on3_actual"},
+  {"name": "Conner Weigman",      "school": "Texas A&M",      "position": "QB", "on3_rank": 27, "nil_value": 1500000, "source": "on3_actual"},
+  {"name": "Jalen Milroe",        "school": "Alabama",        "position": "QB", "on3_rank": 30, "nil_value": 1300000, "source": "on3_estimated"},
+  {"name": "DJ Lagway",           "school": "Florida",        "position": "QB", "on3_rank": 35, "nil_value": 1000000, "source": "on3_estimated"},
+  {"name": "Quinn Ewers",         "school": "Texas",          "position": "QB", "on3_rank": 40, "nil_value":  850000, "source": "on3_estimated"},
+  {"name": "Dillon Gabriel",      "school": "Oregon",         "position": "QB", "on3_rank": 45, "nil_value":  700000, "source": "on3_estimated"},
+  {"name": "Tetairoa McMillan",   "school": "Arizona",        "position": "WR", "on3_rank": 50, "nil_value":  600000, "source": "on3_estimated"},
+  {"name": "Travis Hunter",       "school": "Colorado",       "position": "WR", "on3_rank": 55, "nil_value":  520000, "source": "on3_estimated"},
+  {"name": "Ashton Jeanty",       "school": "Boise State",    "position": "RB", "on3_rank": 60, "nil_value":  450000, "source": "on3_estimated"},
+  {"name": "KJ Jefferson",        "school": "Arkansas",       "position": "QB", "on3_rank": 70, "nil_value":  320000, "source": "on3_estimated"},
+  {"name": "Jase McClellan",      "school": "Alabama",        "position": "RB", "on3_rank": 80, "nil_value":  240000, "source": "on3_estimated"},
+  {"name": "Jermaine Burton",     "school": "Alabama",        "position": "WR", "on3_rank": 90, "nil_value":  180000, "source": "on3_estimated"},
+  {"name": "Isaiah Bond",         "school": "Alabama",        "position": "WR", "on3_rank": 100,"nil_value":  140000, "source": "on3_estimated"}
+]

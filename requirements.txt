@@ -1,5 +1,7 @@
 apify-client
 certifi==2026.2.25
+scikit-learn
+scipy
 charset-normalizer==3.4.4
 idna==3.11
 numpy==2.4.2
