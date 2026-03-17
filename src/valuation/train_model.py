@@ -99,24 +99,30 @@ FEATURE_NAMES = [
 
 def load_labels() -> list[dict]:
     labels = []
-    seen = set()
+    seen: set[tuple] = set()
 
-    # Supplement (manually curated)
+    def _key(p: dict) -> tuple:
+        n = norm(p.get("name", ""))
+        s = norm(p.get("school", "") or "")
+        return (n, s) if s else (n, "")
+
+    # Supplement (manually curated) — takes priority
     if os.path.exists(SUPPL_PATH):
         for p in json.load(open(SUPPL_PATH)):
-            n = norm(p.get("name", ""))
-            if n not in seen and p.get("nil_value"):
-                seen.add(n)
+            k = _key(p)
+            if k not in seen and p.get("nil_value"):
+                seen.add(k)
                 labels.append(p)
 
     # On3 scrape (cleaned)
     if os.path.exists(ON3_PATH):
         for p in json.load(open(ON3_PATH)):
             n = norm(p.get("name", ""))
-            if (n not in seen
+            k = _key(p)
+            if (k not in seen
                     and p.get("nil_value")
                     and not any(kw in n for kw in HS_KEYWORDS)):
-                seen.add(n)
+                seen.add(k)
                 labels.append(p)
 
     return labels
@@ -213,8 +219,8 @@ def power_law(rank, a, b):
 
 def build_rank_calibration(labels) -> tuple | None:
     """Fit rank → NIL value power law for rank-based fallback."""
-    ranked = [(p["on3_rank"], p["nil_value"])
-              for p in labels if p.get("on3_rank") and p.get("nil_value")]
+    ranked = [(p.get("on3_rank") or p.get("rank"), p["nil_value"])
+              for p in labels if (p.get("on3_rank") or p.get("rank")) and p.get("nil_value")]
     if len(ranked) < 5:
         return None
     ranked.sort()

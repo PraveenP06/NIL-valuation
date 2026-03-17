@@ -114,12 +114,12 @@ NFL_DRAFT_NAMES = {_norm(name) for name, _ in NFL_DRAFT_2024}
 POWER4 = {"ACC", "SEC", "Big Ten", "Big 12"}
 
 def get_teams(year: int) -> list[dict]:
-    r = requests.get(f"{BASE_URL}/teams", headers=HEADERS, params={"year": year})
+    r = requests.get(f"{BASE_URL}/teams", headers=HEADERS, params={"year": year}, timeout=10)
     r.raise_for_status()
     return r.json()
 
 def get_roster(team: str, year: int) -> list[dict]:
-    r = requests.get(f"{BASE_URL}/roster", headers=HEADERS, params={"team": team, "year": year})
+    r = requests.get(f"{BASE_URL}/roster", headers=HEADERS, params={"team": team, "year": year}, timeout=10)
     if r.status_code != 200:
         return []
     return r.json() or []
@@ -206,7 +206,10 @@ def main():
     for p in db_players:
         norm_name   = _norm(p["name"])
         norm_school = _norm(p["school"] or "")
-        if (norm_name, norm_school) in NFL_DRAFT_NORM or norm_name in NFL_DRAFT_NAMES:
+        # Prefer (name, school) match; only fall back to name-only when unique in DB
+        if (norm_name, norm_school) in NFL_DRAFT_NORM:
+            draft_pids.append(p["id"])
+        elif norm_name in NFL_DRAFT_NAMES and len(db_name_only.get(norm_name, [])) == 1:
             draft_pids.append(p["id"])
     print(f"  Found {len(draft_pids)} draft picks in DB")
 
