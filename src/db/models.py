@@ -10,6 +10,8 @@ class PlayerBase(BaseModel):
     season: Optional[int] = None
     recruiting_rating: Optional[float] = None
     recruiting_stars: Optional[int] = None
+    class_year: Optional[int] = None
+    nfl_drafted_2024: Optional[bool] = None
 
 class PlayerCreate(PlayerBase):
     pass

@@ -124,10 +124,11 @@ def scrape_via_network(page, url: str) -> list[dict] | None:
 
     # Find the response that looks most like a player list
     for item in captured:
-        players = _extract_players_from_api_body(item["body"])
-        if players and len(players) > 3:
-            print(f"    Got {len(players)} players from API: {item['url']}")
-            return players
+        raw_players = _extract_players_from_api_body(item["body"])
+        if raw_players and len(raw_players) > 3:
+            print(f"    Got {len(raw_players)} players from API: {item['url']}")
+            # Normalize via _parse_api_player so all downstream code sees consistent keys
+            return [_parse_api_player(p, i + 1) for i, p in enumerate(raw_players)]
 
     return None
 
@@ -489,12 +490,14 @@ def main():
     print(f"Scraping {args.pages} pages from On3 NIL rankings...")
     players = scrape_on3(num_pages=args.pages)
 
-    # Deduplicate — keep first occurrence of each name
+    # Deduplicate — prefer (name, school) key; fall back to name-only when school absent
     seen = set()
     unique = []
     for p in players:
-        key = (p.get("name") or "").lower().strip()
-        if key and key not in seen:
+        name = (p.get("name") or "").lower().strip()
+        school = (p.get("school") or "").lower().strip()
+        key = (name, school) if school else (name, "")
+        if name and key not in seen:
             seen.add(key)
             unique.append(p)
     unique.sort(key=lambda x: x.get("rank") or 9999)

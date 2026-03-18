@@ -50,14 +50,17 @@ def norm(s: str) -> str:
 
 
 def load_labels() -> list[dict]:
-    labels, seen = [], set()
+    labels = []
+    seen: set[tuple] = set()
     for path in [SUPPL_PATH, ON3_PATH]:
         if not os.path.exists(path):
             continue
         for p in json.load(open(path)):
             n = norm(p.get("name", ""))
-            if n not in seen and p.get("nil_value") and not any(kw in n for kw in HS_KEYWORDS):
-                seen.add(n)
+            s = norm(p.get("school", "") or "")
+            key = (n, s) if s else (n, "")
+            if key not in seen and p.get("nil_value") and not any(kw in n for kw in HS_KEYWORDS):
+                seen.add(key)
                 labels.append(p)
     return labels
 
@@ -205,7 +208,8 @@ def main():
     print(f"  {'#':<4} {'Name':<28} {'School':<22} {'Pos':<5} {'Cls':<4} {'NIL Value':>12}  Score")
     print(f"  {'-'*85}")
     for i, row in df.head(25).iterrows():
-        cls = int(row["class_year"]) if row.get("class_year") else "?"
+        cy = row.get("class_year")
+        cls = int(cy) if cy and not (isinstance(cy, float) and math.isnan(cy)) else "?"
         print(f"  {i+1:<4} {row['name']:<28} {(row['school'] or '?'):<22} "
               f"{(row['position'] or '?'):<5} {str(cls):<4} ${row['nil_value']:>11,.0f}  {row['formula_score']:.1f}")
 
