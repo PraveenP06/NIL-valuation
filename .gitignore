@@ -45,3 +45,12 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code local config
+.claude/
+
+# Generated model artifacts and prediction outputs
+data/*.pkl
+data/all_players_features.csv
+data/nil_predictions.csv
+data/nil_predictions_calibrated.csv
