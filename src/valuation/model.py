@@ -21,8 +21,19 @@ CONFERENCE_MULTIPLIERS: dict[str, float] = {
     "SEC": 1.3,
     "Big Ten": 1.2,
     "ACC": 1.0,
-    "Big 12": 0.9,
+    "Big 12": 0.95,
 }
+
+# Class year → score (0-100). JR peak NIL — proven on field, NFL hype.
+CLASS_YEAR_SCORES: dict[int, float] = {
+    1: 50.0,   # FR: unproven
+    2: 70.0,   # SO: developing
+    3: 90.0,   # JR: peak NIL, proven + NFL spotlight
+    4: 75.0,   # SR: proven but last year of eligibility
+}
+
+# Non-skill positions that don't accumulate yards/TDs
+NON_SKILL_POSITIONS = {"OL", "OT", "OG", "C", "DL", "DT", "DE", "EDGE", "NT", "LB", "ILB", "OLB", "K", "P", "LS"}
 
 # Tier 1: elite programs (90–100 base school score)
 TIER1_SCHOOLS = {
@@ -57,7 +68,7 @@ CONFERENCE_SCHOOL_FALLBACK: dict[str, float] = {
 # Scoring functions
 # ---------------------------------------------------------------------------
 
-def calculate_performance_score(stats: PerformanceStats | None) -> float:
+def calculate_performance_score(stats: PerformanceStats | None, position: str | None = None) -> float:
     """Return a 0–100 performance score."""
     if stats is None:
         return 0.0
@@ -84,6 +95,17 @@ def calculate_performance_score(stats: PerformanceStats | None) -> float:
             present[field] = min(float(val), cap) / cap * 100.0
 
     if not present:
+        # Non-skill positions (OL, DL, LB, etc.) have no yards/TDs.
+        # Score them on team wins + usage share instead.
+        pos = (position or "").upper().strip()
+        if pos in NON_SKILL_POSITIONS or pos == "":
+            team_wins = getattr(stats, "team_wins", None)
+            usage = getattr(stats, "usage_share", None)
+            wins_score = min(float(team_wins or 0), 13.0) / 13.0 * 100.0
+            usage_score = min(float(usage or 0), 1.0) * 100.0
+            if usage is not None:
+                return round(wins_score * 0.6 + usage_score * 0.4, 2)
+            return round(wins_score * 0.7, 2)
         return 0.0
 
     # Redistribute weight proportionally among present fields
@@ -92,7 +114,13 @@ def calculate_performance_score(stats: PerformanceStats | None) -> float:
     return round(score, 2)
 
 
-def calculate_social_score(social: SocialMedia | None, cap: int = 500_000) -> float:
+def calculate_class_year_score(player: Player) -> float:
+    """Return a 0–100 class year score. Juniors peak — proven + NFL spotlight."""
+    cy = getattr(player, "class_year", None)
+    return CLASS_YEAR_SCORES.get(cy, 65.0)  # 65 = unknown/default
+
+
+def calculate_social_score(social: SocialMedia | None, cap: int = 3_000_000) -> float:
     """Return a 0–100 social score with engagement and verification bonuses."""
     if social is None:
         return 0.0
@@ -161,36 +189,37 @@ def estimate_nil_value(
         nil_value = (perf*0.30 + social*0.25 + school*0.20
                      + pos_mult*0.15 + conf_mult*0.10) * base_value
     """
-    perf_score = calculate_performance_score(stats)
-    social_score = calculate_social_score(social, cap=social_cap)
-    school_score = calculate_school_score(player)
-    pos_mult = get_position_multiplier(player.position)
-    conf_mult = get_conference_multiplier(player.conference)
+    perf_score    = calculate_performance_score(stats, position=player.position)
+    social_score  = calculate_social_score(social, cap=social_cap)
+    school_score  = calculate_school_score(player)
+    class_score   = calculate_class_year_score(player)
+    pos_mult      = get_position_multiplier(player.position)
+    conf_mult     = get_conference_multiplier(player.conference)
 
-    # Multipliers are on a 0.7–1.5 scale; normalise to 0–100 for the weighted sum
-    # so all components are on the same scale before applying weights.
-    # pos component (15%): use raw multiplier value directly as a 0–100 proxy
-    # by mapping [0.7, 1.5] → [0, 100]
-    pos_score = (pos_mult - 0.7) / (1.5 - 0.7) * 100.0
+    # Normalise multipliers [min,max] → [0,100] so all components share the same scale
+    pos_score  = (pos_mult  - 0.7) / (1.5 - 0.7) * 100.0
     conf_score = (conf_mult - 0.8) / (1.3 - 0.8) * 100.0
 
+    # Weights: perf 25%, social 25%, school 20%, position 15%, conference 10%, class year 5%
     composite = (
-        perf_score * 0.30
+        perf_score   * 0.25
         + social_score * 0.25
         + school_score * 0.20
-        + pos_score * 0.15
-        + conf_score * 0.10
+        + pos_score    * 0.15
+        + conf_score   * 0.10
+        + class_score  * 0.05
     )
 
     nil_value = round(composite / 100.0 * base_value, 2)
 
     return {
-        "player_id": player.id,
-        "season": player.season,
-        "nil_value": nil_value,
-        "perf_score": perf_score,
-        "social_score": social_score,
-        "school_score": school_score,
-        "position_mult": pos_mult,
+        "player_id":      player.id,
+        "season":         player.season,
+        "nil_value":      nil_value,
+        "perf_score":     perf_score,
+        "social_score":   social_score,
+        "school_score":   school_score,
+        "class_score":    class_score,
+        "position_mult":  pos_mult,
         "conference_mult": conf_mult,
     }

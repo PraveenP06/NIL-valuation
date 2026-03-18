@@ -93,12 +93,16 @@ def scrape_ig_profile(username: str) -> dict | None:
 # DB helpers
 # ---------------------------------------------------------------------------
 
-def fetch_players(client, season: int = None) -> list[dict]:
+def fetch_players(client, season: int = None, stats_only: bool = False) -> list[dict]:
     page_size = 1000
     start = 0
     rows = []
     while True:
-        query = client.table("players").select("id,name,school")
+        if stats_only:
+            # Only return players who have a performance_stats row
+            query = client.table("players").select("id,name,school,performance_stats!inner(player_id)")
+        else:
+            query = client.table("players").select("id,name,school")
         if season is not None:
             query = query.eq("season", season)
         batch = query.range(start, start + page_size - 1).execute().data or []
@@ -106,7 +110,7 @@ def fetch_players(client, season: int = None) -> list[dict]:
         if len(batch) < page_size:
             break
         start += page_size
-    return rows
+    return [{"id": r["id"], "name": r["name"], "school": r["school"]} for r in rows]
 
 
 def already_fetched(client) -> set[int]:
@@ -151,9 +155,9 @@ def save_player(client, p: dict, profile: dict | None) -> bool:
 # Main
 # ---------------------------------------------------------------------------
 
-def ingest(skip_existing: bool = True, max_players: int = None, season: int = None):
+def ingest(skip_existing: bool = True, max_players: int = None, season: int = None, stats_only: bool = False):
     client = get_client()
-    players = fetch_players(client, season=season)
+    players = fetch_players(client, season=season, stats_only=stats_only)
     label = f"season={season}" if season else "all seasons"
     print(f"Found {len(players)} players in DB ({label})")
 
@@ -221,5 +225,6 @@ if __name__ == "__main__":
     parser.add_argument("--refetch", action="store_true", help="Re-fetch already saved players")
     parser.add_argument("--max-players", type=int, default=None, help="Limit for testing")
     parser.add_argument("--season", type=int, default=None, help="Filter players by season (e.g. 2024)")
+    parser.add_argument("--stats-only", action="store_true", help="Only process players who have performance stats")
     args = parser.parse_args()
-    ingest(skip_existing=not args.refetch, max_players=args.max_players, season=args.season)
+    ingest(skip_existing=not args.refetch, max_players=args.max_players, season=args.season, stats_only=args.stats_only)
