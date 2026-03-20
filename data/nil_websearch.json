@@ -334,5 +334,82 @@
     "position": "QB",
     "nil_value": 1500000,
     "source": "web_2025"
+  },
+  {
+    "name": "Quinn Ewers",
+    "school": "Texas",
+    "position": "QB",
+    "nil_value": 4500000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Quinshon Judkins",
+    "school": "Ohio State",
+    "position": "RB",
+    "nil_value": 1100000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Shedeur Sanders",
+    "school": "Colorado",
+    "position": "QB",
+    "nil_value": 5100000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Kyren Lacy",
+    "school": "LSU",
+    "position": "WR",
+    "nil_value": 1000000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Arch Manning IV",
+    "school": "Texas",
+    "position": "QB",
+    "nil_value": 2000000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Miller Moss",
+    "school": "USC",
+    "position": "QB",
+    "nil_value": 1200000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Jordyn Tyson",
+    "school": "Arizona State",
+    "position": "WR",
+    "nil_value": 1000000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Dillon Gabriel",
+    "school": "Oregon",
+    "position": "QB",
+    "nil_value": 1000000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Justin Ball",
+    "school": "Mississippi State",
+    "position": "TE",
+    "nil_value": 1200000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Mike Wright Jr.",
+    "school": "Northwestern",
+    "position": "QB",
+    "nil_value": 1400000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Que'Sean Brown",
+    "school": "Duke",
+    "position": "WR",
+    "nil_value": 1400000,
+    "source": "web_search_2025"
   }
 ]
