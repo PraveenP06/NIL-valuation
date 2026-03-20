@@ -68,9 +68,9 @@ _ON3_RE = re.compile(
 # Generic "$X million" with NIL context nearby
 _MILLION_RE = re.compile(r'\$\s*([\d,.]+)\s*(?:million|M)\b', re.IGNORECASE)
 
-# Range: "$X – $Y million"
+# Range: "$X – $Y million" OR "$X,000 – $Y,000" (M suffix now optional)
 _RANGE_RE = re.compile(
-    r'\$\s*([\d,.]+)\s*(?:million|M)?\s*[-–]\s*\$?\s*([\d,.]+)\s*(?:million|M)\b',
+    r'\$\s*([\d,.]+)\s*(?:million|M)?\s*[-–]\s*\$?\s*([\d,.]+)(?:\s*(?:million|M)\b)?',
     re.IGNORECASE,
 )
 
@@ -88,7 +88,13 @@ def _has_nil_context(text: str, pos: int) -> bool:
     return bool(_NIL_CONTEXT_RE.search(window))
 
 
-def parse_nil_value(text: str) -> float | None:
+def _name_near_match(text: str, pos: int, full_name: str) -> bool:
+    """Return True if player's full name appears within 300 chars of pos."""
+    window = text[max(0, pos - 300): pos + 300]
+    return full_name.lower() in window.lower()
+
+
+def parse_nil_value(text: str, full_name: str = "") -> float | None:
     """Extract individual NIL dollar amount from snippet. Returns dollars or None."""
     # On3-style structured result (highest confidence)
     m = _ON3_RE.search(text)
@@ -98,20 +104,27 @@ def parse_nil_value(text: str) -> float | None:
         if _in_range(val):
             return round(val)
 
-    # Range → midpoint, but only with NIL context
+    # Range → midpoint
+    # Accept if NIL context nearby OR player's full name is near the range.
+    # Ratio guard (hi < 5×lo) prevents wide collective-budget ranges.
     m = _RANGE_RE.search(text)
-    if m and _has_nil_context(text, m.start()):
+    if m:
         lo = _float(m.group(1))
         hi = _float(m.group(2))
         if lo < 50:
             lo *= 1_000_000
         if hi < 50:
             hi *= 1_000_000
-        mid = (lo + hi) / 2
-        if _in_range(mid):
-            return round(mid)
+        # Both values must be plausible and the range must not be absurdly wide
+        if hi > lo > 100_000 and hi / lo < 5:
+            mid = (lo + hi) / 2
+            if _in_range(mid):
+                has_ctx = _has_nil_context(text, m.start())
+                has_name = bool(full_name) and _name_near_match(text, m.start(), full_name)
+                if has_ctx or has_name:
+                    return round(mid)
 
-    # Generic "$X million" — require NIL context AND player name in window
+    # Generic "$X million" — require NIL context
     m = _MILLION_RE.search(text)
     if m and _has_nil_context(text, m.start()):
         val = _float(m.group(1)) * 1_000_000
@@ -130,6 +143,8 @@ def search_nil_value(name: str, school: str) -> float | None:
         f'"{name}" NIL valuation site:on3.com',
         f'"{name}" "{school}" NIL valuation',
         f'"{first} {last}" NIL value college football 2025',
+        f'"{first} {last}" NIL deal 2024 2025',
+        f'"{name}" NIL contract amount',
     ]
     for query in queries:
         try:
@@ -139,7 +154,7 @@ def search_nil_value(name: str, school: str) -> float | None:
                 # Extra guard: player's last name must appear in the snippet
                 if last.lower() not in snippet.lower():
                     continue
-                val = parse_nil_value(snippet)
+                val = parse_nil_value(snippet, full_name=name)
                 if val is not None:
                     return val
         except Exception as e:
