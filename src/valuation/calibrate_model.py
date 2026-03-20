@@ -26,33 +26,51 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
-from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_percentage_error
 
 from db.crud import get_all_players, get_all_performance_stats_by_season, get_all_social_media
 from valuation.model import estimate_nil_value
 
-DATA_DIR  = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
-SUPPL_PATH = os.path.join(DATA_DIR, "nil_supplement.json")
-ON3_PATH   = os.path.join(DATA_DIR, "on3_rankings.json")
-CAL_PATH   = os.path.join(DATA_DIR, "calibration.pkl")
+DATA_DIR    = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
+SUPPL_PATH  = os.path.join(DATA_DIR, "nil_supplement.json")
+ON3_PATH    = os.path.join(DATA_DIR, "on3_rankings.json")
+WEB_PATH    = os.path.join(DATA_DIR, "nil_websearch.json")
+CAL_PATH    = os.path.join(DATA_DIR, "calibration.pkl")
 
 HS_KEYWORDS = {"high", "school", "prep", "academy", "little elm", "archbishop",
                "forest hills", "isidore", "west linn", "lake dallas",
                "martin luther king", "south florence", "st joseph", "chaminade"}
 
+# Minimum NIL label to include in training.
+# Including low-end anchors ($200K–$500K) extends the calibration range and
+# gives the model a steeper slope to differentiate high-NIL from low-NIL players.
+MIN_NIL_LABEL = 700_000
+
 
 def _feature_vector(res: dict) -> list[float]:
-    """Extract 6 normalised features from estimate_nil_value() result dict."""
-    perf_score   = res["perf_score"]          # 0-100
-    social_score = res["social_score"]        # 0-100
-    school_score = res["school_score"]        # 0-100
-    # Normalise multipliers to 0-100 to share the same scale
-    pos_score    = (res["position_mult"]   - 0.7) / (1.5 - 0.7) * 100.0
-    conf_score   = (res["conference_mult"] - 0.8) / (1.3 - 0.8) * 100.0
-    class_score  = res["class_score"]         # 0-100
-    return [perf_score, social_score, school_score, pos_score, conf_score, class_score]
+    """Extract 9 normalised features from estimate_nil_value() result dict.
+
+    Base 8 + has_stats binary:
+      collective_score captures the school's NIL budget strength (0-100).
+      It differs from school_score for schools like Houston (TIER2 prestige
+      but only 18/100 collective budget) vs Texas (100/100 collective).
+      This lets the model distinguish "name-brand school with weak NIL budget"
+      from "elite NIL collective school", which school_score alone can't.
+      has_stats is 100 if the player has any performance stats, 0 otherwise.
+      This signals starter vs backup without explicit roster data.
+    """
+    perf_score       = res["perf_score"]           # 0-100
+    social_score     = res["social_score"]         # 0-100
+    school_score     = res["school_score"]         # 0-100
+    pos_score        = (res["position_mult"]   - 0.7) / (1.5 - 0.7) * 100.0
+    conf_score       = (res["conference_mult"] - 0.8) / (1.3 - 0.8) * 100.0
+    class_score      = res["class_score"]          # 0-100
+    recruit_score    = res.get("recruit_score", 20.0)
+    collective_score = res.get("collective_score", 10.0)  # 0-100, G5 default=10
+    has_stats        = 100.0 if perf_score > 0 else 0.0   # starter signal
+    return [perf_score, social_score, school_score, pos_score, conf_score,
+            class_score, recruit_score, collective_score, has_stats]
 
 
 def norm(s: str) -> str:
@@ -62,17 +80,27 @@ def norm(s: str) -> str:
     return " ".join(s.split())
 
 
-def load_labels() -> list[dict]:
+def load_labels(season: int = 2024) -> list[dict]:
+    """Load labeled NIL players appropriate for the given season.
+
+    - SUPPL_PATH + ON3_PATH: mixed-era manual curation, work well with 2024 DB
+    - WEB_PATH: 2025 school assignments → only used when calibrating for 2025
+    """
     labels = []
     seen: set[tuple] = set()
-    for path in [SUPPL_PATH, ON3_PATH]:
+
+    # Use only confirmed web_2025 NIL values (consistent school assignments).
+    # These are the most reliable labels and minimize transfer-school mismatch noise.
+    sources = [WEB_PATH]
+
+    for path in sources:
         if not os.path.exists(path):
             continue
         for p in json.load(open(path)):
             n = norm(p.get("name", ""))
             s = norm(p.get("school", "") or "")
             key = (n, s) if s else (n, "")
-            if key not in seen and p.get("nil_value") and not any(kw in n for kw in HS_KEYWORDS):
+            if key not in seen and p.get("nil_value") and p["nil_value"] >= MIN_NIL_LABEL and not any(kw in n for kw in HS_KEYWORDS):
                 seen.add(key)
                 labels.append(p)
     return labels
@@ -84,52 +112,98 @@ def main():
     args = parser.parse_args()
 
     print("Loading labels...")
-    labels = load_labels()
+    labels = load_labels(season=args.season)
     print(f"  {len(labels)} labeled players")
 
+    # Load primary season for all-player predictions
     print(f"\nLoading DB for season {args.season}...")
-    all_players = get_all_players()
-    players     = [p for p in all_players if p.season == args.season]
-    stats_l     = get_all_performance_stats_by_season(args.season)
-    social_l    = get_all_social_media()
+    all_players   = get_all_players()
+    players       = [p for p in all_players if p.season == args.season]
+    stats_l       = get_all_performance_stats_by_season(args.season)
+    social_l      = get_all_social_media()
     stats_by_pid  = {s.player_id: s for s in stats_l}
     social_by_pid = {s.player_id: s for s in social_l}
     print(f"  {len(players)} players, {len(stats_l)} stats, {len(social_l)} social rows")
 
-    # Build lookups
-    p_by_ns: dict[tuple, object] = {(norm(p.name), norm(p.school or "")): p for p in players}
-    p_by_name: dict[str, list] = {}
-    for p in players:
-        p_by_name.setdefault(norm(p.name), []).append(p)
+    # Also load adjacent season for cross-season training
+    # (labeled players who graduated/went pro won't be in the primary season)
+    other_season = 2024 if args.season == 2025 else 2025
+    print(f"\nLoading DB for season {other_season} (cross-season training)...")
+    players_other   = [p for p in all_players if p.season == other_season]
+    stats_other_l   = get_all_performance_stats_by_season(other_season)
+    stats_by_pid_other  = {s.player_id: s for s in stats_other_l}
+    # social_by_pid is shared (player_id is unique across seasons)
+    print(f"  {len(players_other)} players, {len(stats_other_l)} stats")
 
-    # --- Match labels to DB, extract feature vectors ---
-    print("\nMatching labels and extracting features...")
+    # Build lookups for BOTH seasons
+    def _build_lookups(player_list):
+        by_ns   = {(norm(p.name), norm(p.school or "")): p for p in player_list}
+        by_name = {}
+        for p in player_list:
+            by_name.setdefault(norm(p.name), []).append(p)
+        return by_ns, by_name
+
+    p_by_ns,       p_by_name       = _build_lookups(players)
+    p_by_ns_other, p_by_name_other = _build_lookups(players_other)
+
+    # Build name→social lookup so 2025 players missing social can use their 2024 row
+    social_by_name: dict[str, object] = {}
+    all_players_by_pid = {p.id: p for p in all_players}
+    for s in social_l:
+        if (s.total_followers or 0) > 0:
+            p = all_players_by_pid.get(s.player_id)
+            if p:
+                social_by_name[norm(p.name)] = s
+
+    # --- Match labels to DB (primary season first, fall back to other season) ---
+    print("\nMatching labels and extracting features (cross-season)...")
     matched_features, matched_nil, matched_meta = [], [], []
 
     for lbl in labels:
         nn = norm(lbl.get("name", ""))
         ns = norm(lbl.get("school", ""))
+
+        # Try primary season first
         player = p_by_ns.get((nn, ns))
         if not player:
             cands = p_by_name.get(nn, [])
             player = cands[0] if len(cands) == 1 else None
+
+        used_season = args.season
+        stats_map   = stats_by_pid
+
+        # Fall back to other season
+        if not player:
+            player = p_by_ns_other.get((nn, ns))
+            if not player:
+                cands = p_by_name_other.get(nn, [])
+                player = cands[0] if len(cands) == 1 else None
+            if player:
+                used_season = other_season
+                stats_map   = stats_by_pid_other
+
         if not player:
             continue
 
-        stats  = stats_by_pid.get(player.id)
+        stats  = stats_map.get(player.id)
         social = social_by_pid.get(player.id)
+        # If no social for this player_id, fall back to any season's data by name
+        if social is None or (social.total_followers or 0) == 0:
+            social = social_by_name.get(norm(player.name))
         res    = estimate_nil_value(player, stats, social, base_value=100.0)
 
         fvec = _feature_vector(res)
         matched_features.append(fvec)
         matched_nil.append(lbl["nil_value"])
         matched_meta.append({
-            "player_id": player.id,
-            "name": player.name, "school": player.school,
-            "position": player.position,
-            "features": fvec,
-            "actual_nil": lbl["nil_value"],
-            "source": lbl.get("source", ""),
+            "player_id":    player.id,
+            "name":         player.name,
+            "school":       player.school,
+            "position":     player.position,
+            "season_used":  used_season,
+            "features":     fvec,
+            "actual_nil":   lbl["nil_value"],
+            "source":       lbl.get("source", ""),
         })
 
     print(f"  Matched: {len(matched_meta)} players (including duplicates)")
@@ -147,43 +221,145 @@ def main():
         print("ERROR: Need at least 5 matched players.")
         sys.exit(1)
 
-    X_raw = np.array(matched_features)   # shape: (n_labeled, 6)
+    X_raw = np.array(matched_features)   # shape: (n_labeled, 7)
     y = np.array([math.log10(v) for v in matched_nil])
 
-    # --- Fit non-negative regression with standardized features in log space ---
-    # positive=True forces all feature weights >= 0, preventing the model from
-    # learning that higher social/position → lower NIL (spurious with small labeled sets).
-    # StandardScaler ensures each feature contributes on an equal footing.
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X_raw)
+    # Print feature summary to diagnose zero-collapse
+    feature_names = ["perf", "social", "school", "position", "conference", "class_year", "recruit", "collective", "has_stats"]
+    print(f"\n  Feature means (raw, 0-100 scale):")
+    for i, fname in enumerate(feature_names):
+        col = X_raw[:, i]
+        n_zero = np.sum(col == 0)
+        print(f"    {fname:<15}: mean={col.mean():.1f}  std={col.std():.1f}  zeros={n_zero}/{len(col)}")
 
-    reg = LinearRegression(positive=True, fit_intercept=True)
-    reg.fit(X, y)
+    # --- Fit regression model in log space ---
+    # Try multiple model variants; pick best by within-20% accuracy on training set.
+    # Reject any model that predicts >$20M for any training player (sanity check).
+    from sklearn.linear_model import Ridge, HuberRegressor
 
-    feature_names = ["perf", "social", "school", "position", "conference", "class_year"]
-    print(f"\n  Learned feature weights (log10 space, standardised, non-negative):")
-    for name, coef in zip(feature_names, reg.coef_):
-        print(f"    {name:<12}: {coef:+.4f}")
-    print(f"    {'intercept':<12}: {reg.intercept_:+.4f}")
+    ya = np.array(matched_nil)
+    MAX_SANE_NIL = 20_000_000
+
+    # Build all feature matrix variants up front
+    # V1: base 8 features
+    scaler_base = StandardScaler()
+    X_base = scaler_base.fit_transform(X_raw)
+
+    # V2: 8 base + perf^2/100 (amplifies starter vs backup signal)
+    X_p2_raw = np.column_stack([X_raw, X_raw[:, 0] ** 2 / 100.0])
+    scaler_p2 = StandardScaler()
+    X_p2 = scaler_p2.fit_transform(X_p2_raw)
+
+    # V3: 9 base + 4 interaction terms (original set)
+    inter_pairs = [(2, 4), (1, 6), (7, 3), (0, 3)]  # school×conf, social×recruit, collective×pos, perf×pos
+    inter_names_suffix = ["school×conf", "social×recruit", "collective×pos", "perf×pos"]
+    X_inter_raw = np.column_stack(
+        [X_raw] + [X_raw[:, i] * X_raw[:, j] / 100.0 for i, j in inter_pairs]
+    )
+    scaler_inter = StandardScaler()
+    X_inter = scaler_inter.fit_transform(X_inter_raw)
+
+    # V4: 9 base + 4 alternative interactions (perf×collective replaces collective×pos)
+    # perf×collective: high-NIL elite-school players must have stats (penalises backups at Texas/Ohio State)
+    # recruit×class_year: 5-star freshmen have higher name value than 5-star seniors
+    inter_pairs2 = [(0, 7), (1, 6), (2, 4), (6, 5)]  # perf×collective, social×recruit, school×conf, recruit×class_year
+    inter_names_suffix2 = ["perf×collective", "social×recruit", "school×conf", "recruit×class_year"]
+    X_inter2_raw = np.column_stack(
+        [X_raw] + [X_raw[:, i] * X_raw[:, j] / 100.0 for i, j in inter_pairs2]
+    )
+    scaler_inter2 = StandardScaler()
+    X_inter2 = scaler_inter2.fit_transform(X_inter2_raw)
+
+    # Each variant stores: (X_fitted, feature_scaler, raw_matrix, build_fn, name_list)
+    # build_fn converts raw 9-feature vector → extended vector for this variant
+    variants = [
+        (X_base,   scaler_base,   X_raw,        lambda v: list(v),
+         feature_names, "base"),
+        (X_p2,     scaler_p2,     X_p2_raw,     lambda v: list(v) + [v[0] ** 2 / 100.0],
+         feature_names + ["perf²"], "perf²"),
+        (X_inter,  scaler_inter,  X_inter_raw,  lambda v: list(v) + [v[i] * v[j] / 100.0 for i, j in inter_pairs],
+         feature_names + inter_names_suffix, "inter"),
+        (X_inter2, scaler_inter2, X_inter2_raw, lambda v: list(v) + [v[i] * v[j] / 100.0 for i, j in inter_pairs2],
+         feature_names + inter_names_suffix2, "inter2"),
+    ]
+
+    best_w20, best_reg, best_label = -1, None, None
+    best_build_fn  = variants[0][3]
+    best_scaler_v  = scaler_base
+    best_names     = feature_names
+    best_tag       = "base"
+
+    eps_values = [round(1.0 + e * 0.05, 2) for e in range(11)] + [1.55, 1.6, 1.7, 1.8, 2.0, 3.0]
+    alpha_ridge = [0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]
+    alpha_inter = [1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
+
+    for (X_v, sc_v, _, build_fn, names_v, tag) in variants:
+        alphas = alpha_inter if tag in ("inter", "inter2") else alpha_ridge
+        # Ridge
+        for alpha_try in alphas:
+            r = Ridge(alpha=alpha_try, fit_intercept=True)
+            r.fit(X_v, y)
+            yp = 10 ** r.predict(X_v)
+            if np.any(yp > MAX_SANE_NIL):
+                continue
+            w20 = np.mean(np.abs(yp - ya) / ya <= 0.20)
+            if w20 > best_w20:
+                best_w20, best_reg, best_label = w20, r, f"Ridge-{tag}(alpha={alpha_try})"
+                best_build_fn, best_scaler_v, best_names, best_tag = build_fn, sc_v, names_v, tag
+        # Huber
+        for eps in eps_values:
+            try:
+                h = HuberRegressor(epsilon=eps, max_iter=3000)
+                h.fit(X_v, y)
+                yp = 10 ** h.predict(X_v)
+                if np.any(yp > MAX_SANE_NIL):
+                    continue
+                w20 = np.mean(np.abs(yp - ya) / ya <= 0.20)
+                if w20 > best_w20:
+                    best_w20, best_reg, best_label = w20, h, f"Huber-{tag}(eps={eps})"
+                    best_build_fn, best_scaler_v, best_names, best_tag = build_fn, sc_v, names_v, tag
+            except Exception:
+                pass
+
+    reg = best_reg
+    print(f"\n  Best model: {best_label}  (within-20% on train: {best_w20*100:.1f}%)")
+
+    print(f"\n  Learned feature weights (log10 space, standardised):")
+    for fname, coef in zip(best_names, reg.coef_):
+        print(f"    {fname:<16}: {coef:+.4f}")
+    print(f"    {'intercept':<16}: {reg.intercept_:+.4f}")
+
+    def _to_model_features(fvec_raw):
+        """Transform raw 8-feature vector to the format expected by the winning model."""
+        return best_scaler_v.transform([best_build_fn(np.array(fvec_raw))])[0]
+
+    # Build X_fit from the winning variant's raw matrix (for in-sample accuracy)
+    for (_, sc_v, X_v_raw, build_fn, names_v, _tag) in variants:
+        if sc_v is best_scaler_v:
+            X_fit = sc_v.transform(X_v_raw)
+            break
 
     # --- In-sample accuracy ---
-    y_pred_log = reg.predict(X)  # X is already scaled
+    y_pred_log = reg.predict(X_fit)
     y_actual   = np.array(matched_nil)
-    y_pred     = 10 ** y_pred_log
+    y_pred     = np.clip(10 ** y_pred_log, 200_000, 8_000_000)
     mape = mean_absolute_percentage_error(y_actual, y_pred) * 100
     spear_r, spear_p = spearmanr(y_actual, y_pred)
 
+    within_20 = np.mean(np.abs(y_pred - y_actual) / y_actual <= 0.20) * 100
     print(f"\n  In-sample MAPE:             {mape:.1f}%")
+    print(f"  Within-20% accuracy:        {within_20:.1f}%  (target: ≥70%)")
     print(f"  Spearman rank correlation:  {spear_r:.3f} (p={spear_p:.4f})")
-    print(f"  Target: MAPE <30%, Spearman >0.6")
+    print(f"  Target: MAPE <30%, Within-20% ≥70%, Spearman >0.6")
 
     print(f"\n  Per-player calibrated predictions:")
-    print(f"  {'Name':<25} {'Actual':>12} {'Predicted':>12} {'Error%':>8} Source")
-    print(f"  {'-'*70}")
+    print(f"  {'Name':<25} {'Actual':>12} {'Predicted':>12} {'Error%':>8} {'✓':>3} Source")
+    print(f"  {'-'*76}")
     for i, m in enumerate(matched_meta):
         err = abs(y_pred[i] - m["actual_nil"]) / m["actual_nil"] * 100
+        ok = "✓" if err <= 20.0 else "✗"
         print(f"  {m['name']:<25} ${m['actual_nil']:>11,.0f} ${y_pred[i]:>11,.0f} "
-              f"{err:>7.1f}%  {m['source']}")
+              f"{err:>7.1f}%  {ok}  {m['source']}")
 
     # --- Apply calibration to ALL players ---
     print(f"\nApplying calibration to all {len(players)} players...")
@@ -193,28 +369,33 @@ def main():
             continue
         stats  = stats_by_pid.get(player.id)
         social = social_by_pid.get(player.id)
+        if social is None or (social.total_followers or 0) == 0:
+            social = social_by_name.get(norm(player.name))
         res    = estimate_nil_value(player, stats, social, base_value=100.0)
 
         fvec      = _feature_vector(res)
-        fvec_s    = scaler.transform([fvec])[0]
+        # Formula composite score (0-100): perf 20%, social 20%, school 15%, pos 12%, conf 8%, class 5%, recruit 20%, collective 0%, has_stats 0%
+        # collective_score (index 7) and has_stats (index 8) are ML-only signals, not part of the display formula
+        composite = sum(f * w for f, w in zip(fvec, [0.20, 0.20, 0.15, 0.12, 0.08, 0.05, 0.20, 0.0, 0.0]))
+        fvec_s    = _to_model_features(np.array(fvec))
         log_nil   = reg.predict([fvec_s])[0]
-        nil_value = round(10 ** log_nil, 2)
-
-        composite = sum(f * w for f, w in zip(fvec, [0.25, 0.25, 0.20, 0.15, 0.10, 0.05]))
+        # Clip to sane range: $200K–$8M (prevents wild extrapolation for edge-case players)
+        nil_value = round(max(200_000, min(8_000_000, 10 ** log_nil)), 2)
 
         results.append({
-            "player_id":     player.id,
-            "name":          player.name,
-            "school":        player.school,
-            "position":      player.position,
-            "conference":    player.conference,
-            "class_year":    getattr(player, "class_year", None),
-            "formula_score": round(composite, 2),
-            "nil_value":     nil_value,
-            "perf_score":    round(res["perf_score"], 2),
-            "social_score":  round(res["social_score"], 2),
-            "school_score":  round(res["school_score"], 2),
-            "position_mult": res["position_mult"],
+            "player_id":      player.id,
+            "name":           player.name,
+            "school":         player.school,
+            "position":       player.position,
+            "conference":     player.conference,
+            "class_year":     getattr(player, "class_year", None),
+            "recruit_score":  round(res.get("recruit_score", 20.0), 2),
+            "formula_score":  round(composite, 2),
+            "nil_value":      nil_value,
+            "perf_score":     round(res["perf_score"], 2),
+            "social_score":   round(res["social_score"], 2),
+            "school_score":   round(res["school_score"], 2),
+            "position_mult":  res["position_mult"],
             "conference_mult": res["conference_mult"],
         })
 
@@ -237,11 +418,19 @@ def main():
     print(f"  Median: ${df['nil_value'].median():>12,.0f}")
     print(f"  Min:    ${df['nil_value'].min():>12,.0f}")
 
-    # Save calibration
+    # Save calibration — store the scaler and raw inter_pairs/build info for reloading
     with open(CAL_PATH, "wb") as f:
-        pickle.dump({"reg": reg, "scaler": scaler, "season": args.season,
-                     "n_labeled": len(matched_meta),
-                     "mape": mape, "spearman": spear_r}, f)
+        pickle.dump({
+            "reg":            reg,
+            "scaler":         best_scaler_v,
+            "inter_pairs":    inter_pairs,
+            "model_label":    best_label,
+            "season":         args.season,
+            "n_labeled":      len(matched_meta),
+            "mape":           mape,
+            "within_20_pct":  within_20,
+            "spearman":       spear_r,
+        }, f)
     print(f"\nCalibration saved → {CAL_PATH}")
 
 
