@@ -1,0 +1,338 @@
+[
+  {
+    "name": "Arch Manning",
+    "school": "Texas",
+    "position": "QB",
+    "nil_value": 6800000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Carson Beck",
+    "school": "Miami",
+    "position": "QB",
+    "nil_value": 4300000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Jeremiah Smith",
+    "school": "Ohio State",
+    "position": "WR",
+    "nil_value": 4200000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Sam Leavitt",
+    "school": "LSU",
+    "position": "QB",
+    "nil_value": 4000000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Garrett Nussmeier",
+    "school": "LSU",
+    "position": "QB",
+    "nil_value": 3700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "LaNorris Sellers",
+    "school": "South Carolina",
+    "position": "QB",
+    "nil_value": 3700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "DJ Lagway",
+    "school": "Florida",
+    "position": "QB",
+    "nil_value": 3700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Cade Klubnik",
+    "school": "Clemson",
+    "position": "QB",
+    "nil_value": 3400000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Drew Allar",
+    "school": "Penn State",
+    "position": "QB",
+    "nil_value": 3100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Bryce Underwood",
+    "school": "Michigan",
+    "position": "QB",
+    "nil_value": 3100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Brendan Sorsby",
+    "school": "Texas Tech",
+    "position": "QB",
+    "nil_value": 3100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Dante Moore",
+    "school": "Oregon",
+    "position": "QB",
+    "nil_value": 3000000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Cam Coleman",
+    "school": "Texas",
+    "position": "WR",
+    "nil_value": 2900000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Darian Mensah",
+    "school": "Duke",
+    "position": "QB",
+    "nil_value": 2800000,
+    "source": "web_2025"
+  },
+  {
+    "name": "John Mateer",
+    "school": "Oklahoma",
+    "position": "QB",
+    "nil_value": 2700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Ryan Williams",
+    "school": "Alabama",
+    "position": "WR",
+    "nil_value": 2700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Fernando Mendoza",
+    "school": "Indiana",
+    "position": "QB",
+    "nil_value": 2600000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Dylan Raiola",
+    "school": "Nebraska",
+    "position": "QB",
+    "nil_value": 2500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Julian Sayin",
+    "school": "Ohio State",
+    "position": "QB",
+    "nil_value": 2500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Diego Pavia",
+    "school": "Vanderbilt",
+    "position": "QB",
+    "nil_value": 2500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Drew Mestemaker",
+    "school": "Oklahoma State",
+    "position": "QB",
+    "nil_value": 2500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Dylan Stewart",
+    "school": "South Carolina",
+    "position": "LB",
+    "nil_value": 2500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Josh Hoover",
+    "school": "TCU",
+    "position": "QB",
+    "nil_value": 2400000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Caleb Downs",
+    "school": "Ohio State",
+    "position": "S",
+    "nil_value": 2400000,
+    "source": "web_2025"
+  },
+  {
+    "name": "CJ Bailey",
+    "school": "NC State",
+    "position": "QB",
+    "nil_value": 2300000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Ty Simpson",
+    "school": "Alabama",
+    "position": "QB",
+    "nil_value": 2300000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Jayden Maiava",
+    "school": "USC",
+    "position": "QB",
+    "nil_value": 2200000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Taylen Green",
+    "school": "Arkansas",
+    "position": "QB",
+    "nil_value": 2100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Trevor Etienne",
+    "school": "Georgia",
+    "position": "RB",
+    "nil_value": 2100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Mason Heintschel",
+    "school": "Pittsburgh",
+    "position": "QB",
+    "nil_value": 2100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Nico Iamaleava",
+    "school": "UCLA",
+    "position": "QB",
+    "nil_value": 2000000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Jackson Arnold",
+    "school": "Auburn",
+    "position": "QB",
+    "nil_value": 2000000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Marcel Reed",
+    "school": "Texas A&M",
+    "position": "QB",
+    "nil_value": 2100000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Jalen Milroe",
+    "school": "Alabama",
+    "position": "QB",
+    "nil_value": 1900000,
+    "source": "web_2025"
+  },
+  {
+    "name": "David Stone",
+    "school": "Oklahoma",
+    "position": "DL",
+    "nil_value": 1900000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Malik Washington",
+    "school": "Maryland",
+    "position": "QB",
+    "nil_value": 1900000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Byrum Brown",
+    "school": "Auburn",
+    "position": "QB",
+    "nil_value": 1900000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Jaron-Keawe Sagapolutele",
+    "school": "California",
+    "position": "QB",
+    "nil_value": 1800000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Jordan Seaton",
+    "school": "LSU",
+    "position": "OT",
+    "nil_value": 1700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Sawyer Robertson",
+    "school": "Baylor",
+    "position": "QB",
+    "nil_value": 1900000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Trinidad Chambliss",
+    "school": "Ole Miss",
+    "position": "QB",
+    "nil_value": 1600000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Carnell Tate",
+    "school": "Ohio State",
+    "position": "WR",
+    "nil_value": 1600000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Colin Simmons",
+    "school": "Texas",
+    "position": "EDGE",
+    "nil_value": 1500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Conner Weigman",
+    "school": "Houston",
+    "position": "QB",
+    "nil_value": 1500000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Evan Stewart",
+    "school": "Oregon",
+    "position": "WR",
+    "nil_value": 1700000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Dia Bell",
+    "school": "Texas",
+    "position": "QB",
+    "nil_value": 1000000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Avery Johnson",
+    "school": "Kansas State",
+    "position": "QB",
+    "nil_value": 1800000,
+    "source": "web_2025"
+  },
+  {
+    "name": "Beau Pribula",
+    "school": "Missouri",
+    "position": "QB",
+    "nil_value": 1500000,
+    "source": "web_2025"
+  }
+]

@@ -32,6 +32,14 @@ CLASS_YEAR_SCORES: dict[int, float] = {
     4: 75.0,   # SR: proven but last year of eligibility
 }
 
+# Recruit stars → score (0-100). 5-star = 100, unrated = 20.
+RECRUIT_STAR_SCORES: dict[int, float] = {
+    5: 100.0,
+    4: 75.0,
+    3: 45.0,
+    2: 20.0,
+}
+
 # Non-skill positions that don't accumulate yards/TDs
 NON_SKILL_POSITIONS = {"OL", "OT", "OG", "C", "DL", "DT", "DE", "EDGE", "NT", "LB", "ILB", "OLB", "K", "P", "LS"}
 
@@ -61,6 +69,70 @@ CONFERENCE_SCHOOL_FALLBACK: dict[str, float] = {
     "Big Ten": 78.0,
     "ACC": 72.0,
     "Big 12": 70.0,
+}
+
+# NIL collective strength score (0-100).
+# Reflects the annual budget/aggressiveness of each school's collective fund.
+# Source: reported collective budgets, recruiting spend, and NIL deal patterns.
+COLLECTIVE_SCORES: dict[str, float] = {
+    "Texas":        100.0,
+    "Ohio State":    95.0,
+    "Michigan":      90.0,
+    "LSU":           88.0,
+    "Alabama":       85.0,
+    "Georgia":       85.0,
+    "Florida":       80.0,
+    "South Carolina": 80.0,
+    "Miami":         80.0,
+    "USC":           78.0,
+    "Notre Dame":    75.0,
+    "Clemson":       75.0,
+    "Penn State":    72.0,
+    "Oregon":        70.0,
+    "Texas A&M":     68.0,
+    "Auburn":        65.0,
+    "Tennessee":     65.0,
+    "Florida State": 60.0,
+    "Oklahoma":      60.0,
+    "UCLA":          58.0,
+    "Wisconsin":     55.0,
+    "Nebraska":      55.0,
+    "Iowa":          50.0,
+    # Tier-2 programs
+    "Ole Miss":      50.0,
+    "Vanderbilt":    50.0,
+    "Duke":          48.0,
+    "Maryland":      45.0,
+    "Indiana":       45.0,
+    "Arkansas":      42.0,
+    "Mississippi State": 40.0,
+    "Kentucky":      40.0,
+    "Missouri":      38.0,
+    "NC State":      38.0,
+    "Baylor":        35.0,
+    "TCU":           35.0,
+    "Iowa State":    35.0,
+    "Kansas State":  32.0,
+    "Baylor":        32.0,
+    "West Virginia": 30.0,
+    "Texas Tech":    30.0,
+    "Oklahoma State": 30.0,
+    "Pittsburgh":    28.0,
+    "North Carolina": 28.0,
+    "Virginia Tech": 25.0,
+    "North Carolina State": 25.0,
+    "Louisville":    25.0,
+    "Cincinnati":    20.0,
+    "UCF":           20.0,
+    "Houston":       18.0,
+    "BYU":           18.0,
+    "Colorado":      22.0,
+    "Utah":          20.0,
+    "Arizona":       18.0,
+    "Arizona State": 18.0,
+    "Washington":    22.0,
+    "California":    15.0,
+    "Stanford":      15.0,
 }
 
 
@@ -120,6 +192,24 @@ def calculate_class_year_score(player: Player) -> float:
     return CLASS_YEAR_SCORES.get(cy, 65.0)  # 65 = unknown/default
 
 
+def calculate_recruit_score(player: Player) -> float:
+    """Return a 0–100 recruit prestige score based on star rating.
+
+    5-star recruits (Arch Manning, Dylan Stewart, etc.) command premium NIL
+    independent of stats/social — pure brand/name-recognition value.
+    Unrated players default to 20 (below 2-star).
+    """
+    stars = getattr(player, "recruiting_stars", None)
+    if stars:
+        return RECRUIT_STAR_SCORES.get(int(stars), 20.0)
+    # Fall back to continuous rating if stars missing
+    rating = getattr(player, "recruiting_rating", None)
+    if rating:
+        # CFBD ratings typically range 0.7–1.0; normalize to 0–100
+        return round(max(0.0, min(100.0, (float(rating) - 0.7) / 0.3 * 100.0)), 2)
+    return 20.0  # unrated / unknown
+
+
 def calculate_social_score(social: SocialMedia | None, cap: int = 3_000_000) -> float:
     """Return a 0–100 social score with engagement and verification bonuses."""
     if social is None:
@@ -157,6 +247,17 @@ def calculate_school_score(player: Player) -> float:
     return CONFERENCE_SCHOOL_FALLBACK.get(conf, 50.0)
 
 
+def calculate_collective_score(player: Player) -> float:
+    """Return a 0–100 NIL collective strength score for the player's school.
+
+    Reflects each school's collective fund budget and NIL deal aggressiveness.
+    Schools with large collectives (Texas $30M+, Ohio State $20M+) score higher.
+    G5 programs default to 10.0.
+    """
+    school = (player.school or "").strip()
+    return COLLECTIVE_SCORES.get(school, 10.0)
+
+
 def get_position_multiplier(position: str | None) -> float:
     """Return a 0.7–1.5 position multiplier."""
     if not position:
@@ -180,7 +281,7 @@ def estimate_nil_value(
     stats: PerformanceStats | None,
     social: SocialMedia | None,
     base_value: float = 10_000.0,
-    social_cap: int = 500_000,
+    social_cap: int = 3_000_000,
 ) -> dict:
     """
     Compute NIL value and return a dict with nil_value + all component scores.
@@ -189,37 +290,42 @@ def estimate_nil_value(
         nil_value = (perf*0.30 + social*0.25 + school*0.20
                      + pos_mult*0.15 + conf_mult*0.10) * base_value
     """
-    perf_score    = calculate_performance_score(stats, position=player.position)
-    social_score  = calculate_social_score(social, cap=social_cap)
-    school_score  = calculate_school_score(player)
-    class_score   = calculate_class_year_score(player)
-    pos_mult      = get_position_multiplier(player.position)
-    conf_mult     = get_conference_multiplier(player.conference)
+    perf_score       = calculate_performance_score(stats, position=player.position)
+    social_score     = calculate_social_score(social, cap=social_cap)
+    school_score     = calculate_school_score(player)
+    class_score      = calculate_class_year_score(player)
+    recruit_score    = calculate_recruit_score(player)
+    collective_score = calculate_collective_score(player)
+    pos_mult         = get_position_multiplier(player.position)
+    conf_mult        = get_conference_multiplier(player.conference)
 
     # Normalise multipliers [min,max] → [0,100] so all components share the same scale
     pos_score  = (pos_mult  - 0.7) / (1.5 - 0.7) * 100.0
     conf_score = (conf_mult - 0.8) / (1.3 - 0.8) * 100.0
 
-    # Weights: perf 25%, social 25%, school 20%, position 15%, conference 10%, class year 5%
+    # Weights: perf 20%, social 20%, school 15%, position 12%, conference 8%, class 5%, recruit 20%
     composite = (
-        perf_score   * 0.25
-        + social_score * 0.25
-        + school_score * 0.20
-        + pos_score    * 0.15
-        + conf_score   * 0.10
-        + class_score  * 0.05
+        perf_score    * 0.20
+        + social_score  * 0.20
+        + school_score  * 0.15
+        + pos_score     * 0.12
+        + conf_score    * 0.08
+        + class_score   * 0.05
+        + recruit_score * 0.20
     )
 
     nil_value = round(composite / 100.0 * base_value, 2)
 
     return {
-        "player_id":      player.id,
-        "season":         player.season,
-        "nil_value":      nil_value,
-        "perf_score":     perf_score,
-        "social_score":   social_score,
-        "school_score":   school_score,
-        "class_score":    class_score,
-        "position_mult":  pos_mult,
+        "player_id":        player.id,
+        "season":           player.season,
+        "nil_value":        nil_value,
+        "perf_score":       perf_score,
+        "social_score":     social_score,
+        "school_score":     school_score,
+        "class_score":      class_score,
+        "recruit_score":    recruit_score,
+        "collective_score": collective_score,
+        "position_mult":    pos_mult,
         "conference_mult": conf_mult,
     }
