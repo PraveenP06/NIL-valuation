@@ -225,6 +225,9 @@ def main():
                 social_by_name[norm(p.name)] = s
 
     # --- Match labels to DB (primary season first, fall back to other season) ---
+    # Priority: school-exact match > name-only fallback.
+    # Transfer players (label school ≠ old school) should use the label's school season
+    # so features reflect the program context for which the NIL value was earned.
     print("\nMatching labels and extracting features (cross-season)...")
     matched_features, matched_nil, matched_meta = [], [], []
 
@@ -232,22 +235,31 @@ def main():
         nn = norm(lbl.get("name", ""))
         ns = norm(lbl.get("school", ""))
 
-        # Try primary season first
+        player     = None
+        used_season = args.season
+        stats_map   = stats_by_pid
+
+        # 1. Try exact (name, school) in primary season
         player = p_by_ns.get((nn, ns))
+
+        # 2. Try exact (name, school) in other season (preferred over name-only mismatch)
+        if not player:
+            p_other = p_by_ns_other.get((nn, ns))
+            if p_other:
+                player      = p_other
+                used_season = other_season
+                stats_map   = stats_by_pid_other
+
+        # 3. Name-only fallback in primary season (only if unique)
         if not player:
             cands = p_by_name.get(nn, [])
             player = cands[0] if len(cands) == 1 else None
 
-        used_season = args.season
-        stats_map   = stats_by_pid
-
-        # Fall back to other season
+        # 4. Name-only fallback in other season (only if unique)
         if not player:
-            player = p_by_ns_other.get((nn, ns))
-            if not player:
-                cands = p_by_name_other.get(nn, [])
-                player = cands[0] if len(cands) == 1 else None
-            if player:
+            cands = p_by_name_other.get(nn, [])
+            if len(cands) == 1:
+                player      = cands[0]
                 used_season = other_season
                 stats_map   = stats_by_pid_other
 
@@ -274,8 +286,11 @@ def main():
             "features":     fvec,
             "actual_nil":   lbl["nil_value"],
             "source":       src,
-            # Curated (web_2025) = 5×, rank-tier anchors = 1×, DDG-scraped = 0 (not trusted yet)
-            "weight":       5.0 if src == "web_2025" else (1.0 if src == "rank_anchor" else 0.0),
+            # Curated (web_2025) = 5×, AI-verified (ai_search_2025) = 2×,
+            # rank-tier anchors = 1×, DDG-scraped (web_search_2025) = 0 (not trusted yet)
+            "weight":       5.0 if src == "web_2025" else (
+                            2.0 if src == "ai_search_2025" else (
+                            1.0 if src == "rank_anchor" else 0.0)),
         })
 
     print(f"  Matched: {len(matched_meta)} players (including duplicates)")
