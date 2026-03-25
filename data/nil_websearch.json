@@ -411,5 +411,75 @@
     "position": "WR",
     "nil_value": 1400000,
     "source": "web_search_2025"
+  },
+  {
+    "name": "Jonah Coleman",
+    "school": "Washington",
+    "position": "RB",
+    "nil_value": 1200000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Dylan Edwards",
+    "school": "Kansas State",
+    "position": "RB",
+    "nil_value": 425000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Nate Frazier",
+    "school": "Georgia",
+    "position": "RB",
+    "nil_value": 730000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Monroe Freeling",
+    "school": "Georgia",
+    "position": "OT",
+    "nil_value": 514000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Zachariah Branch",
+    "school": "USC",
+    "position": "WR",
+    "nil_value": 1200000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Dakorien Moore",
+    "school": "Oregon",
+    "position": "WR",
+    "nil_value": 497000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Kewan Lacy",
+    "school": "Ole Miss",
+    "position": "RB",
+    "nil_value": 1800000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "CJ Baxter",
+    "school": "Texas",
+    "position": "RB",
+    "nil_value": 282000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Jeremiyah Love",
+    "school": "Notre Dame",
+    "position": "RB",
+    "nil_value": 1600000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Leonard Moore",
+    "school": "Notre Dame",
+    "position": "CB",
+    "nil_value": 822000,
+    "source": "ai_search_2025"
   }
 ]
