@@ -117,45 +117,25 @@ def main():
 
     print(f"\nMatched {len(updates)} players to recruit data")
 
-    # Bulk update via SQL VALUES clause — much faster than per-row requests
-    import json as _json
-    BATCH = 500
     update_list = [(pid, data["recruiting_stars"], data["recruiting_rating"])
                    for pid, data in updates.items()]
     updated = 0
-    for i in tqdm(range(0, len(update_list), BATCH), desc="Updating players"):
-        chunk = update_list[i:i + BATCH]
-        values = ", ".join(
-            f"({pid}, {stars if stars is not None else 'NULL'}, "
-            f"{rating if rating is not None else 'NULL'})"
-            for pid, stars, rating in chunk
-        )
-        sql = f"""
-            UPDATE players SET
-                recruiting_stars  = v.stars::int,
-                recruiting_rating = v.rating::float
-            FROM (VALUES {values}) AS v(id, stars, rating)
-            WHERE players.id = v.id::int
-        """
-        client.postgrest.session.post(
-            f"{client.postgrest.base_url}/rpc/exec_sql",
-            json={"query": sql}
-        )
-        # Fall back to individual updates if RPC not available
+    for pid, stars, rating in tqdm(update_list, desc="Updating players"):
         try:
-            from db.connection import get_client as _gc
-            _c = _gc()
-            _c.table("players").select("id").eq("id", chunk[0][0]).execute()
-        except Exception:
-            pass
-        updated += len(chunk)
+            client.table("players").update({
+                "recruiting_stars":  stars,
+                "recruiting_rating": rating,
+            }).eq("id", pid).execute()
+            updated += 1
+        except Exception as e:
+            tqdm.write(f"  Error updating player {pid}: {e}")
 
     print(f"\n✅ Done! Updated {updated} players with recruit ratings")
 
     # Summary
     stars_dist: dict[int, int] = {}
-    for u in update_list:
-        s = u.get("recruiting_stars") or 0
+    for _, stars, _ in update_list:
+        s = stars or 0
         stars_dist[s] = stars_dist.get(s, 0) + 1
     print("\nStars distribution:")
     for s in sorted(stars_dist, reverse=True):

@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Critical Rules
+
+- **NEVER commit anything unless explicitly asked.** Do not run `git commit` under any circumstance unless the user directly says to commit.
+- **Always ask for confirmation before moving to the next step.** After completing any task or phase, stop and wait for approval before continuing.
+
 ## Environment Setup
 
 ```bash

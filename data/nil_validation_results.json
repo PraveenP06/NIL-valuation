@@ -1,0 +1,1502 @@
+[
+  {
+    "tier": "low",
+    "name": "Charlton Luniewski",
+    "school": "Michigan State",
+    "position": "OL",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "DJ Lundy",
+    "school": "Florida State",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Adonis Forrest",
+    "school": "Colorado",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Dylan Tapley",
+    "school": "Arizona",
+    "position": "WR",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Thomas Gore",
+    "school": "Georgia Tech",
+    "position": "DL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Ahmad Walker",
+    "school": "SMU",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Dylan Caddle",
+    "school": "Houston",
+    "position": "WR",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Tavoy Feagin",
+    "school": "Clemson",
+    "position": "CB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jacorey Whitted",
+    "school": "Mississippi State",
+    "position": "TE",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jordan Floyd",
+    "school": "Georgia Tech",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Trey Flint",
+    "school": "Missouri",
+    "position": "LS",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Raymond Kovalesky",
+    "school": "West Virginia",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jake Wheelock",
+    "school": "Cincinnati",
+    "position": "OL",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Ryon Sayeri",
+    "school": "USC",
+    "position": "P",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Hakeem Ajijolaiya",
+    "school": "TCU",
+    "position": "DL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Ory Williams",
+    "school": "LSU",
+    "position": "OT",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Deandre Duffus",
+    "school": "Maryland",
+    "position": "OL",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Alex Harrison",
+    "school": "Utah",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Roger Alderman",
+    "school": "Utah",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jordan Boyd",
+    "school": "Georgia Tech",
+    "position": "DL",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Rod Elston",
+    "school": "Auburn",
+    "position": "S",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Roger Gradney",
+    "school": "Nebraska",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Marcus Clarke",
+    "school": "Missouri",
+    "position": "CB",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Idrys Cotton",
+    "school": "Northwestern",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Preston Foreman",
+    "school": "UCF",
+    "position": "RB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Marcus Neal Jr.",
+    "school": "Iowa State",
+    "position": "DB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Xavier Johnson",
+    "school": "Florida State",
+    "position": "WR",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jack Griese",
+    "school": "Virginia",
+    "position": "RB",
+    "predicted": 150000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Debron Gatling",
+    "school": "South Carolina",
+    "position": "WR",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Noah Shaw",
+    "school": "Rutgers",
+    "position": "DB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Andres Miyares Jr.",
+    "school": "North Carolina",
+    "position": "QB",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Caleb Surber",
+    "school": "Texas A&M",
+    "position": "DB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Keegan Shackford",
+    "school": "Iowa State",
+    "position": "PK",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Traville Frederick Jr.",
+    "school": "Houston",
+    "position": "TE",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Kyan McDonald",
+    "school": "Arizona State",
+    "position": "DB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Ru'Quan Buckley",
+    "school": "Michigan State",
+    "position": "DL",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Shancco Matautia",
+    "school": "Arizona",
+    "position": "OL",
+    "predicted": 100000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Paul Fitzgerald",
+    "school": "Utah",
+    "position": "DE",
+    "predicted": 80000.0,
+    "actual": 1000000,
+    "within_20": false,
+    "error_pct": 92.0
+  },
+  {
+    "tier": "low",
+    "name": "Ben Taylor-Whitfield",
+    "school": "TCU",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Bryce Purnell",
+    "school": "Virginia",
+    "position": "DT",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "William Wells",
+    "school": "UCF",
+    "position": "DB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Ethan Barr",
+    "school": "UCF",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Ben Freehill",
+    "school": "Purdue",
+    "position": "PK",
+    "predicted": 150000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "David Ndukwe",
+    "school": "Houston",
+    "position": "OL",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Derek Morris",
+    "school": "California",
+    "position": "PK",
+    "predicted": 150000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Xavier Restrepo",
+    "school": "Miami",
+    "position": "WR",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jamroc Grimsley",
+    "school": "Florida",
+    "position": "DB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "George Leibold",
+    "school": "Cincinnati",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Jack Ploszay",
+    "school": "Wake Forest",
+    "position": "P",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "low",
+    "name": "Cavan Tuley",
+    "school": "Houston",
+    "position": "LB",
+    "predicted": 80000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Samuel Brown V",
+    "school": "Rutgers",
+    "position": "RB",
+    "predicted": 250000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Nolan Baudo",
+    "school": "Ohio State",
+    "position": "WR",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Terhyon Nichols",
+    "school": "Kentucky",
+    "position": "DB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Damon Wilson II",
+    "school": "Georgia",
+    "position": "DE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Jalen Marshall",
+    "school": "Missouri",
+    "position": "DT",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Charlie Becker",
+    "school": "Indiana",
+    "position": "WR",
+    "predicted": 400000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "West Weeks",
+    "school": "LSU",
+    "position": "LB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Cam McCormick",
+    "school": "Miami",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Luke Deal",
+    "school": "Auburn",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Tommy Schuster",
+    "school": "Michigan State",
+    "position": "QB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Troy Omeire",
+    "school": "Arizona State",
+    "position": "WR",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "D'Yoni Hill",
+    "school": "Miami",
+    "position": "CB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Braylon Staley",
+    "school": "Tennessee",
+    "position": "WR",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Koi Perich",
+    "school": "Minnesota",
+    "position": "DB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Charlie Browder",
+    "school": "Tennessee",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Garrett Oakley",
+    "school": "Kansas State",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Joe Jackson",
+    "school": "Kansas State",
+    "position": "RB",
+    "predicted": 250000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Jacobe Johnson",
+    "school": "Oklahoma",
+    "position": "DB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Jaden Richardson",
+    "school": "USC",
+    "position": "WR",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Ashton Woods",
+    "school": "North Carolina",
+    "position": "LB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Preston Howard",
+    "school": "Maryland",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Connor Lew",
+    "school": "Auburn",
+    "position": "OL",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Carsen Ryan",
+    "school": "Utah",
+    "position": "TE",
+    "predicted": 250000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "JJ Kohl",
+    "school": "Iowa State",
+    "position": "QB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "DK Kaufman",
+    "school": "NC State",
+    "position": "S",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Will Kacmarek",
+    "school": "Ohio State",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Dan Villari",
+    "school": "Syracuse",
+    "position": "TE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Heinrich Haarberg",
+    "school": "Nebraska",
+    "position": "TE",
+    "predicted": 400000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Xavier Guillory",
+    "school": "Arizona State",
+    "position": "WR",
+    "predicted": 731987.95,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Keanu Koht",
+    "school": "Alabama",
+    "position": "EDGE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Justin Terrell",
+    "school": "NC State",
+    "position": "DE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Michael Wooten",
+    "school": "Arizona",
+    "position": "OL",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Seth Coleman",
+    "school": "Illinois",
+    "position": "LB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Key'Shawn Smith",
+    "school": "SMU",
+    "position": "WR",
+    "predicted": 699563.14,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Oscar Delp",
+    "school": "Georgia",
+    "position": "TE",
+    "predicted": 400000.0,
+    "actual": 4300000,
+    "within_20": false,
+    "error_pct": 90.7
+  },
+  {
+    "tier": "mid",
+    "name": "Tommy Martin",
+    "school": "Missouri",
+    "position": "S",
+    "predicted": 200000.0,
+    "actual": 1500000,
+    "within_20": false,
+    "error_pct": 86.7
+  },
+  {
+    "tier": "mid",
+    "name": "Collin Schlee",
+    "school": "Virginia Tech",
+    "position": "QB",
+    "predicted": 250000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Jimari Butler",
+    "school": "Nebraska",
+    "position": "DE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Davit Boyajyan",
+    "school": "Washington",
+    "position": "OL",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Bryce Kirtz",
+    "school": "Northwestern",
+    "position": "WR",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Dean Miller",
+    "school": "Kansas",
+    "position": "DE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Juelz Goff",
+    "school": "Pittsburgh",
+    "position": "RB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Jamal Meriweather",
+    "school": "Georgia",
+    "position": "OL",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Philip Blidi",
+    "school": "Auburn",
+    "position": "DL",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Flip Dixon",
+    "school": "Rutgers",
+    "position": "DB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Lance Rice",
+    "school": "Rutgers",
+    "position": "LB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Kip Lewis",
+    "school": "Oklahoma",
+    "position": "LB",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Eric Phillips",
+    "school": "Cincinnati",
+    "position": "DE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "Shane Cokes",
+    "school": "Colorado",
+    "position": "DL",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "mid",
+    "name": "CJ Madden",
+    "school": "Purdue",
+    "position": "DE",
+    "predicted": 200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Duce Robinson",
+    "school": "USC",
+    "position": "WR",
+    "predicted": 1326391.88,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Le'Veon Moss",
+    "school": "Texas A&M",
+    "position": "RB",
+    "predicted": 1404648.54,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Kam Davis",
+    "school": "Florida State",
+    "position": "RB",
+    "predicted": 1059791.04,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Brant Kuithe",
+    "school": "Utah",
+    "position": "TE",
+    "predicted": 925174.36,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Mikey Pauley",
+    "school": "Kansas",
+    "position": "QB",
+    "predicted": 1722866.62,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Star Thomas",
+    "school": "Duke",
+    "position": "RB",
+    "predicted": 1827825.04,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Malcolm Simmons",
+    "school": "Auburn",
+    "position": "WR",
+    "predicted": 962660.54,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Terrance Ferguson",
+    "school": "Oregon",
+    "position": "TE",
+    "predicted": 1418905.72,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Zeon Chriss",
+    "school": "Houston",
+    "position": "QB",
+    "predicted": 1366726.81,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "C.J. Williams",
+    "school": "Wisconsin",
+    "position": "WR",
+    "predicted": 850284.17,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Derrick McFall",
+    "school": "SMU",
+    "position": "RB",
+    "predicted": 1200000.0,
+    "actual": 4200000,
+    "within_20": false,
+    "error_pct": 71.4
+  },
+  {
+    "tier": "high",
+    "name": "Behren Morton",
+    "school": "Texas Tech",
+    "position": "QB",
+    "predicted": 2665554.42,
+    "actual": 1700000,
+    "within_20": false,
+    "error_pct": 56.8
+  },
+  {
+    "tier": "high",
+    "name": "DeAndre Moore Jr.",
+    "school": "Texas",
+    "position": "WR",
+    "predicted": 1088056.77,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Tank Hawkins",
+    "school": "Florida",
+    "position": "WR",
+    "predicted": 837325.81,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Will Rogers",
+    "school": "Washington",
+    "position": "QB",
+    "predicted": 1757460.68,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Miles Kitselman",
+    "school": "Tennessee",
+    "position": "TE",
+    "predicted": 1262754.57,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Tommy Castellanos",
+    "school": "Boston College",
+    "position": "QB",
+    "predicted": 2000000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Max Brosmer",
+    "school": "Minnesota",
+    "position": "QB",
+    "predicted": 1683332.2,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Jordan Waters",
+    "school": "NC State",
+    "position": "RB",
+    "predicted": 887802.26,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Aidan Chiles",
+    "school": "Michigan State",
+    "position": "QB",
+    "predicted": 1384445.45,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Amari Daniels",
+    "school": "Texas A&M",
+    "position": "RB",
+    "predicted": 1528951.33,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Deion Burks",
+    "school": "Oklahoma",
+    "position": "WR",
+    "predicted": 1151697.43,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Keyjuan Brown",
+    "school": "Louisville",
+    "position": "RB",
+    "predicted": 956180.99,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Peyton Lewis",
+    "school": "Tennessee",
+    "position": "RB",
+    "predicted": 1101707.63,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Ethan Garbers",
+    "school": "UCLA",
+    "position": "QB",
+    "predicted": 1859796.71,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Will Hammond",
+    "school": "Texas Tech",
+    "position": "QB",
+    "predicted": 2465824.94,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Alberto Mendoza",
+    "school": "Indiana",
+    "position": "QB",
+    "predicted": 2077666.73,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Kenyon Sadiq",
+    "school": "Oregon",
+    "position": "TE",
+    "predicted": 1245800.41,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Landen Thomas",
+    "school": "Florida State",
+    "position": "TE",
+    "predicted": 1323881.78,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Cameron Rising",
+    "school": "Utah",
+    "position": "QB",
+    "predicted": 2217196.21,
+    "actual": 2500000,
+    "within_20": true,
+    "error_pct": 11.3
+  },
+  {
+    "tier": "high",
+    "name": "Will Sheppard",
+    "school": "Colorado",
+    "position": "WR",
+    "predicted": 935942.68,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Brock Vandagriff",
+    "school": "Kentucky",
+    "position": "QB",
+    "predicted": 1512005.41,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Elijah Brown",
+    "school": "Stanford",
+    "position": "QB",
+    "predicted": 2030615.82,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Dylan Rizk",
+    "school": "UCF",
+    "position": "QB",
+    "predicted": 1807391.2,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Michael Smith",
+    "school": "South Carolina",
+    "position": "TE",
+    "predicted": 1179796.8,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Amaree Williams",
+    "school": "Florida State",
+    "position": "TE",
+    "predicted": 1132568.23,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Grayson McCall",
+    "school": "NC State",
+    "position": "QB",
+    "predicted": 1986753.94,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Cutter Boley",
+    "school": "Kentucky",
+    "position": "QB",
+    "predicted": 1484283.58,
+    "actual": 1600000,
+    "within_20": true,
+    "error_pct": 7.2
+  },
+  {
+    "tier": "high",
+    "name": "Johntay Cook",
+    "school": "Texas",
+    "position": "WR",
+    "predicted": 1117034.8,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Nicco Marchiol",
+    "school": "West Virginia",
+    "position": "QB",
+    "predicted": 1805876.21,
+    "actual": 4500000,
+    "within_20": false,
+    "error_pct": 59.9
+  },
+  {
+    "tier": "high",
+    "name": "Luke Kromenhoek",
+    "school": "Florida State",
+    "position": "QB",
+    "predicted": 1551205.67,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Ja'Kobi Lane",
+    "school": "USC",
+    "position": "WR",
+    "predicted": 1523330.75,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Zavion Thomas",
+    "school": "LSU",
+    "position": "WR",
+    "predicted": 1124235.46,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Isaac Wilson",
+    "school": "Utah",
+    "position": "QB",
+    "predicted": 2071220.71,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Chris Brazzell II",
+    "school": "Tennessee",
+    "position": "WR",
+    "predicted": 913461.55,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Mike Mitchell",
+    "school": "Utah",
+    "position": "RB",
+    "predicted": 1200000.0,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Justin Lamson",
+    "school": "Stanford",
+    "position": "QB",
+    "predicted": 1228179.4,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Quinten Joyner",
+    "school": "USC",
+    "position": "RB",
+    "predicted": 1033416.12,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Josh Cuevas",
+    "school": "Alabama",
+    "position": "TE",
+    "predicted": 1147484.57,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  },
+  {
+    "tier": "high",
+    "name": "Desmond Reid",
+    "school": "Pittsburgh",
+    "position": "RB",
+    "predicted": 876782.21,
+    "actual": null,
+    "within_20": null,
+    "error_pct": null
+  }
+]
