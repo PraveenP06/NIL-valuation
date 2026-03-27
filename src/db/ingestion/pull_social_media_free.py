@@ -52,15 +52,21 @@ def extract_ig_username(url: str) -> str | None:
 
 
 def ddg_find_username(name: str, school: str) -> str | None:
-    query = f"{name} {school} site:instagram.com"
-    try:
-        results = DDGS().text(query, max_results=5)
-        for r in (results or []):
-            username = extract_ig_username(r.get("href") or "")
-            if username:
-                return username
-    except Exception as e:
-        tqdm.write(f"  DDG error for {name}: {e}")
+    # Include "football" to avoid matching celebrity accounts with the same name
+    queries = [
+        f"{name} {school} football site:instagram.com",
+        f"{name} {school} site:instagram.com",
+    ]
+    for query in queries:
+        try:
+            results = DDGS().text(query, max_results=5)
+            for r in (results or []):
+                username = extract_ig_username(r.get("href") or "")
+                if username:
+                    return username
+        except Exception as e:
+            tqdm.write(f"  DDG error for {name}: {e}")
+        time.sleep(SEARCH_DELAY)
     return None
 
 
@@ -68,7 +74,7 @@ def ddg_find_username(name: str, school: str) -> str | None:
 # Step 2: scrape instagram.com/{username}/ → follower count
 # ---------------------------------------------------------------------------
 
-def scrape_ig_profile(username: str) -> dict | None:
+def scrape_ig_profile(username: str, player_last_name: str = "") -> dict | None:
     url = f"https://i.instagram.com/api/v1/users/web_profile_info/?username={username}"
     try:
         resp = requests.get(url, headers=IG_HEADERS, timeout=15)
@@ -76,12 +82,22 @@ def scrape_ig_profile(username: str) -> dict | None:
             user = resp.json().get("data", {}).get("user") or {}
             followers = user.get("edge_followed_by", {}).get("count")
             if followers is not None:
+                # Validate: the account's display name must contain the player's last name.
+                # This prevents matching celebrity accounts with common player names
+                # (e.g., "Willie Nelson", "AJ Green" the NFL player).
+                if player_last_name:
+                    full_name = (user.get("full_name") or "").lower()
+                    username_lower = username.lower()
+                    last = player_last_name.lower()
+                    if last not in full_name and last not in username_lower:
+                        tqdm.write(f"  ✗ Name mismatch: @{username} ({user.get('full_name')!r}) ≠ {player_last_name!r}")
+                        return None
                 return {
                     "instagram_followers": int(followers),
                     "verified_instagram": user.get("is_verified"),
                 }
         elif resp.status_code == 404:
-            return None  # profile doesn't exist
+            return None
         else:
             tqdm.write(f"  IG API {resp.status_code} for {username}")
     except requests.exceptions.RequestException as e:
@@ -114,19 +130,22 @@ def fetch_players(client, season: int = None, stats_only: bool = False) -> list[
 
 
 def already_fetched(client) -> set[int]:
+    """Return player_ids that already have a non-null follower count."""
     page_size = 1000
     start = 0
     ids = set()
     while True:
         batch = (
             client.table("social_media")
-            .select("player_id")
+            .select("player_id,total_followers")
             .range(start, start + page_size - 1)
             .execute()
             .data or []
         )
         for row in batch:
-            ids.add(row["player_id"])
+            # Only skip if we have a real (non-null) follower count
+            if row.get("total_followers") is not None:
+                ids.add(row["player_id"])
         if len(batch) < page_size:
             break
         start += page_size
@@ -155,13 +174,43 @@ def save_player(client, p: dict, profile: dict | None) -> bool:
 # Main
 # ---------------------------------------------------------------------------
 
-def ingest(skip_existing: bool = True, max_players: int = None, season: int = None, stats_only: bool = False):
-    client = get_client()
-    players = fetch_players(client, season=season, stats_only=stats_only)
-    label = f"season={season}" if season else "all seasons"
-    print(f"Found {len(players)} players in DB ({label})")
+def fetch_nulled_players(client, season: int = None) -> list[dict]:
+    """Return players who have a social_media row with null total_followers (bad prior scrape)."""
+    page_size = 1000
+    start = 0
+    null_ids: set[int] = set()
+    while True:
+        batch = (
+            client.table("social_media")
+            .select("player_id")
+            .is_("total_followers", "null")
+            .range(start, start + page_size - 1)
+            .execute()
+            .data or []
+        )
+        for r in batch:
+            null_ids.add(r["player_id"])
+        if len(batch) < page_size:
+            break
+        start += page_size
 
-    if skip_existing:
+    all_players = fetch_players(client, season=season)
+    return [p for p in all_players if p["id"] in null_ids]
+
+
+def ingest(skip_existing: bool = True, max_players: int = None, season: int = None,
+           stats_only: bool = False, refetch_nulled: bool = False):
+    client = get_client()
+
+    if refetch_nulled:
+        players = fetch_nulled_players(client, season=season)
+        print(f"Re-scraping {len(players)} players with null follower counts")
+    else:
+        players = fetch_players(client, season=season, stats_only=stats_only)
+        label = f"season={season}" if season else "all seasons"
+        print(f"Found {len(players)} players in DB ({label})")
+
+    if skip_existing and not refetch_nulled:
         done = already_fetched(client)
         players = [p for p in players if p["id"] not in done]
         print(f"Skipping {len(done)} already fetched → {len(players)} remaining")
@@ -179,12 +228,13 @@ def ingest(skip_existing: bool = True, max_players: int = None, season: int = No
     for i, p in enumerate(tqdm(players, desc="Players", unit="player")):
         # Step 1: find username via DuckDuckGo
         username = ddg_find_username(p["name"], p["school"])
-        time.sleep(SEARCH_DELAY)
 
-        # Step 2: scrape follower count
+        # Step 2: scrape follower count — pass last name for validation
         profile = None
         if username:
-            profile = scrape_ig_profile(username)
+            parts = p["name"].split()
+            last_name = parts[-1] if len(parts) > 1 else parts[0]
+            profile = scrape_ig_profile(username, player_last_name=last_name)
             time.sleep(INSTA_DELAY)
 
         chunk_buffer.append((p, profile))
@@ -222,9 +272,16 @@ def ingest(skip_existing: bool = True, max_players: int = None, season: int = No
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch social media data via DuckDuckGo + requests scrape (free)")
-    parser.add_argument("--refetch", action="store_true", help="Re-fetch already saved players")
+    parser.add_argument("--refetch", action="store_true", help="Re-fetch all players (ignore existing)")
+    parser.add_argument("--refetch-nulled", action="store_true", help="Only re-fetch players with null follower counts (bad previous scrapes)")
     parser.add_argument("--max-players", type=int, default=None, help="Limit for testing")
     parser.add_argument("--season", type=int, default=None, help="Filter players by season (e.g. 2024)")
     parser.add_argument("--stats-only", action="store_true", help="Only process players who have performance stats")
     args = parser.parse_args()
-    ingest(skip_existing=not args.refetch, max_players=args.max_players, season=args.season, stats_only=args.stats_only)
+    ingest(
+        skip_existing=not args.refetch,
+        max_players=args.max_players,
+        season=args.season,
+        stats_only=args.stats_only,
+        refetch_nulled=args.refetch_nulled,
+    )

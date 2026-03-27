@@ -68,16 +68,19 @@ def _social_tier(social_score: float) -> float:
     return 5.0                               # <10K
 
 
-def _feature_vector(res: dict, position: str = "") -> list[float]:
-    """Extract 12 normalised features from estimate_nil_value() result dict.
+def _feature_vector(res: dict, position: str = "", stat_pct: float = 0.0,
+                    role_score: float = 0.0) -> list[float]:
+    """Extract 13 normalised features from estimate_nil_value() result dict.
 
-    Base 8 + has_stats + is_QB + social_tier + social×nonQB:
-      is_QB: binary 100/0 — QBs earn 2-3× non-QBs for same features.
+    Base 8 + has_stats + is_QB + social_tier + stat_pct + role_score:
+      is_QB:      binary 100/0 — QBs earn 2-3× non-QBs for same features.
       social_tier: bucketed social score capturing non-linear follower jumps.
-      social×nonQB: for non-QBs, social following dominates NIL value.
-        A WR with 300K followers earns more than a WR with 10K regardless
-        of school prestige. This term lets the model learn that without
-        being confused by QB data where social matters less.
+      stat_pct:   percentile of player's total_yards within their position group
+                  (0-100). Distinguishes backup RBs from starters at same school.
+      role_score: usage/starter signal (0-100) based on raw attempt/yard counts.
+                  A backup QB with 5 pass attempts scores ~2; a starter with 300
+                  scores 100. Provides a direct, non-percentile starter signal
+                  that the regression can use independently of stat_pct.
     """
     perf_score       = res["perf_score"]           # 0-100
     social_score     = res["social_score"]         # 0-100
@@ -92,7 +95,64 @@ def _feature_vector(res: dict, position: str = "") -> list[float]:
     soc_tier         = _social_tier(social_score)
     return [perf_score, social_score, school_score, pos_score, conf_score,
             class_score, recruit_score, collective_score, has_stats, is_qb,
-            soc_tier]
+            soc_tier, stat_pct, role_score]
+
+
+# Skill positions that accumulate countable yards/stats
+_SKILL_POSITIONS = {"QB", "RB", "WR", "TE", "FB", "SLOT"}
+
+
+def _build_pos_stat_arrays(stats_list, players_by_pid: dict) -> dict:
+    """Build sorted total_yards arrays by position for percentile lookup."""
+    pos_yards: dict[str, list] = {}
+    for s in stats_list:
+        p = players_by_pid.get(s.player_id)
+        if p:
+            pos = (p.position or "").upper()
+            if pos in _SKILL_POSITIONS:
+                yards = getattr(s, "total_yards", 0) or 0
+                if yards > 0:
+                    pos_yards.setdefault(pos, []).append(yards)
+    return {pos: np.sort(arr) for pos, arr in pos_yards.items()}
+
+
+def _stat_percentile(player, stats, pos_arrays: dict) -> float:
+    """Return 0-100 percentile of player's total_yards among their position peers."""
+    pos = (getattr(player, "position", None) or "").upper()
+    if pos not in _SKILL_POSITIONS or stats is None:
+        return 0.0
+    yards = getattr(stats, "total_yards", 0) or 0
+    if yards == 0:
+        return 0.0
+    arr = pos_arrays.get(pos)
+    if arr is None or len(arr) == 0:
+        return 50.0
+    return round(float(np.searchsorted(arr, yards, side="right")) / len(arr) * 100, 1)
+
+
+def _role_score(stats, position: str) -> float:
+    """Usage/role score (0-100): featured starter → high, backup/no stats → low.
+
+    Distinguishes a starting QB (300 pass attempts) from a backup QB (10 attempts)
+    at the same school. Position-aware:
+      QB:       pass attempts 0-300 → 0-100
+      RB/FB:    rush attempts 0-150 → 0-100
+      WR/TE:    total_yards   0-800 → 0-100
+      Other:    always 0 (OL/DL have no direct usage proxy)
+    """
+    if stats is None:
+        return 0.0
+    pos = (position or "").upper()
+    attempts    = getattr(stats, "attempts",    0) or 0
+    total_yards = getattr(stats, "total_yards", 0) or 0
+
+    if pos == "QB":
+        return min(100.0, attempts / 3.0)
+    if pos in ("RB", "FB"):
+        return min(100.0, attempts / 1.5)
+    if pos in ("WR", "TE", "SLOT"):
+        return min(100.0, total_yards / 8.0) if total_yards > 0 else 0.0
+    return 0.0
 
 
 def norm(s: str) -> str:
@@ -127,17 +187,16 @@ def load_labels(season: int = 2024) -> list[dict]:
                 labels.append(p)
 
     # Tier 2: rank-tier band anchors.
-    # Instead of using noisy power-law dollar estimates, we bucket On3 ranks
-    # into 4 bands and assign conservative anchor values (band midpoints).
-    # Each band contributes ~12 sampled players at low weight (1.0 vs curated 5.0).
-    # This teaches the model the shape of the low/mid tier without overwhelming
-    # the curated high-tier labels.
+    # Conservative anchor values prevent power-law over-estimation for ranks 300+.
+    # Kept deliberately small (8 per band) so the curated labels remain the primary
+    # training signal. Too many noisy rank anchors corrupt the regression.
+    # Per-band weights decrease with rank uncertainty.
     RANK_BANDS = [
-        # (rank_lo, rank_hi, anchor_value, per_band_cap)
-        (26,   100,   1_500_000, 8),    # P4 starters, national visibility
-        (101,  300,     800_000, 8),    # solid starters, regional recognition
-        (301,  1000,    400_000, 8),    # roster contributors
-        (1001, 99999,   180_000, 8),    # depth players, walk-ons
+        # (rank_lo, rank_hi, anchor_value, per_band_cap, band_weight)
+        (26,   100,   1_500_000, 8,  1.0),    # P4 starters, national visibility
+        (101,  300,     800_000, 8,  0.8),    # solid starters, regional recognition
+        (301,  1000,    400_000, 8,  0.5),    # roster contributors
+        (1001, 99999,   180_000, 8,  0.4),    # depth players, walk-ons
     ]
     if os.path.exists(RANK_PATH):
         rank_labels = json.load(open(RANK_PATH))
@@ -148,7 +207,7 @@ def load_labels(season: int = 2024) -> list[dict]:
         _random.seed(7)
 
         total_anchors = 0
-        for (rlo, rhi, anchor_val, cap) in RANK_BANDS:
+        for (rlo, rhi, anchor_val, cap, band_w) in RANK_BANDS:
             band = [
                 p for p in rank_labels
                 if rlo <= (p.get("rank") or 99999) <= rhi
@@ -168,6 +227,7 @@ def load_labels(season: int = 2024) -> list[dict]:
                     "position":  p.get("position", ""),
                     "nil_value": anchor_val,
                     "source":    "rank_anchor",
+                    "_weight":   band_w,   # per-band weight (higher = more confident)
                 })
                 total_anchors += 1
         print(f"  Rank-tier anchor labels added: {total_anchors}")
@@ -193,6 +253,9 @@ def main():
     stats_by_pid  = {s.player_id: s for s in stats_l}
     social_by_pid = {s.player_id: s for s in social_l}
     print(f"  {len(players)} players, {len(stats_l)} stats, {len(social_l)} social rows")
+
+    # Build position-level stat percentile arrays for starter vs backup discrimination
+    pos_arrays = _build_pos_stat_arrays(stats_l, {p.id: p for p in players})
 
     # Also load adjacent season for cross-season training
     # (labeled players who graduated/went pro won't be in the primary season)
@@ -273,7 +336,9 @@ def main():
             social = social_by_name.get(norm(player.name))
         res    = estimate_nil_value(player, stats, social, base_value=100.0)
 
-        fvec = _feature_vector(res, position=player.position or "")
+        sp   = _stat_percentile(player, stats, pos_arrays)
+        rs   = _role_score(stats, player.position or "")
+        fvec = _feature_vector(res, position=player.position or "", stat_pct=sp, role_score=rs)
         matched_features.append(fvec)
         matched_nil.append(lbl["nil_value"])
         src = lbl.get("source", "")
@@ -286,11 +351,15 @@ def main():
             "features":     fvec,
             "actual_nil":   lbl["nil_value"],
             "source":       src,
-            # Curated (web_2025) = 5×, AI-verified (ai_search_2025) = 2×,
-            # rank-tier anchors = 1×, DDG-scraped (web_search_2025) = 0 (not trusted yet)
+            # Curated (web_2025) = 5×
+            # AI-verified (ai_search_2025) = 1× — reduced from 2× to prevent low-tier
+            #   labels from diluting elite accuracy. Curated labels (235 total weight)
+            #   need to dominate; low-tier caps handled via post-processing.
+            # rank-tier anchors = 0.2–1.0 (per-band, stored in _weight)
+            # DDG-scraped (web_search_2025) = 0 (not trusted yet)
             "weight":       5.0 if src == "web_2025" else (
-                            2.0 if src == "ai_search_2025" else (
-                            1.0 if src == "rank_anchor" else 0.0)),
+                            1.0 if src == "ai_search_2025" else (
+                            lbl.get("_weight", 1.0) if src == "rank_anchor" else 0.0)),
         })
 
     print(f"  Matched: {len(matched_meta)} players (including duplicates)")
@@ -313,7 +382,7 @@ def main():
     y = np.array([math.log10(v) for v in matched_nil])
 
     # Print feature summary to diagnose zero-collapse
-    feature_names = ["perf", "social", "school", "position", "conference", "class_year", "recruit", "collective", "has_stats", "is_QB", "social_tier"]
+    feature_names = ["perf", "social", "school", "position", "conference", "class_year", "recruit", "collective", "has_stats", "is_QB", "social_tier", "stat_pct", "role_score"]
     print(f"\n  Feature means (raw, 0-100 scale):")
     for i, fname in enumerate(feature_names):
         col = X_raw[:, i]
@@ -370,6 +439,18 @@ def main():
     scaler_inter3 = StandardScaler()
     X_inter3 = scaler_inter3.fit_transform(X_inter3_raw)
 
+    # V6: inter3 + stat_pct×collective interaction
+    # stat_pct×collective (indices 11,7): featured players at high-collective elite schools
+    # earn premium; backups at the same schools don't. Directly targets the CJ Baxter problem:
+    # backup RBs at Texas/Georgia have high collective but low stat_pct → low NIL.
+    inter_pairs4 = [(0, 7), (1, 6), (2, 4), (6, 5), (9, 1), (11, 7), (12, 9)]  # inter3 + stat_pct×collective + role_score×is_QB
+    inter_names_suffix4 = ["perf×collective", "social×recruit", "school×conf", "recruit×class_year", "is_QB×social", "stat_pct×collective", "role×is_QB"]
+    X_inter4_raw = np.column_stack(
+        [X_raw] + [X_raw[:, i] * X_raw[:, j] / 100.0 for i, j in inter_pairs4]
+    )
+    scaler_inter4 = StandardScaler()
+    X_inter4 = scaler_inter4.fit_transform(X_inter4_raw)
+
     # Each variant stores: (X_fitted, feature_scaler, raw_matrix, build_fn, name_list)
     # build_fn converts raw 9-feature vector → extended vector for this variant
     variants = [
@@ -383,6 +464,8 @@ def main():
          feature_names + inter_names_suffix2, "inter2"),
         (X_inter3, scaler_inter3, X_inter3_raw, lambda v: list(v) + [v[i] * v[j] / 100.0 for i, j in inter_pairs3],
          feature_names + inter_names_suffix3, "inter3"),
+        (X_inter4, scaler_inter4, X_inter4_raw, lambda v: list(v) + [v[i] * v[j] / 100.0 for i, j in inter_pairs4],
+         feature_names + inter_names_suffix4, "inter4"),
     ]
 
     best_w20, best_reg, best_label = -1, None, None
@@ -395,11 +478,11 @@ def main():
     alpha_ridge = [0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]
     alpha_inter = [1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0]
 
-    # inter3 has an extra interaction term (5 total) — use stronger regularization
-    alpha_inter3 = [50.0, 100.0, 500.0, 1000.0, 2000.0]
+    # inter3/inter4 have more interaction terms — use stronger regularization
+    alpha_inter34 = [50.0, 100.0, 500.0, 1000.0, 2000.0]
 
     for (X_v, sc_v, _, build_fn, names_v, tag) in variants:
-        alphas = alpha_inter3 if tag == "inter3" else (alpha_inter if tag in ("inter", "inter2") else alpha_ridge)
+        alphas = alpha_inter34 if tag in ("inter3", "inter4") else (alpha_inter if tag in ("inter", "inter2") else alpha_ridge)
         # Ridge
         for alpha_try in alphas:
             r = Ridge(alpha=alpha_try, fit_intercept=True)
@@ -457,7 +540,7 @@ def main():
     spear_r, spear_p = spearmanr(y_actual, y_pred)
 
     curated_mask = sample_weights >= 5.0   # original web_2025 labels only
-    all_web_mask = sample_weights >= 2.0   # original + DDG-scraped
+    all_web_mask = sample_weights >= 1.0   # curated + ai_search + rank_anchors
     within_20_curated = (np.mean(np.abs(y_pred[curated_mask] - y_actual[curated_mask])
                                   / y_actual[curated_mask] <= 0.20) * 100
                          if curated_mask.any() else 0.0)
@@ -469,6 +552,21 @@ def main():
     print(f"  Within-20% (all web):       {within_20_all_web:.1f}%  ({int(all_web_mask.sum())} labels)")
     print(f"  Spearman rank correlation:  {spear_r:.3f} (p={spear_p:.4f})")
     print(f"  Target: MAPE <30%, Within-20% ≥70%, Spearman >0.6")
+
+    # Tier-stratified accuracy: diagnose where the model is weakest
+    print(f"\n  Tier-stratified accuracy (all web labels, within-20%):")
+    tier_defs = [
+        ("elite  (>$2.5M)",   2_500_000, float("inf")),
+        ("high   ($1-2.5M)",  1_000_000, 2_500_000),
+        ("mid    ($500K-$1M)",  500_000,   1_000_000),
+        ("low    (<$500K)",          0,     500_000),
+    ]
+    for tier_name, lo, hi in tier_defs:
+        mask = (ya >= lo) & (ya < hi) & (sample_weights >= 1.0)
+        if mask.sum() > 0:
+            w20_t = np.mean(np.abs(y_pred[mask] - ya[mask]) / ya[mask] <= 0.20) * 100
+            med_err = np.median(np.abs(y_pred[mask] - ya[mask]) / ya[mask]) * 100
+            print(f"    {tier_name:<22}: {w20_t:5.1f}%  (n={mask.sum():2d}, median-err={med_err:.1f}%)")
 
     print(f"\n  Per-player calibrated predictions:")
     print(f"  {'Name':<25} {'Actual':>12} {'Predicted':>12} {'Error%':>8} {'✓':>3} Source")
@@ -491,10 +589,12 @@ def main():
             social = social_by_name.get(norm(player.name))
         res    = estimate_nil_value(player, stats, social, base_value=100.0)
 
-        fvec      = _feature_vector(res, position=player.position or "")
+        sp        = _stat_percentile(player, stats, pos_arrays)
+        rs        = _role_score(stats, player.position or "")
+        fvec      = _feature_vector(res, position=player.position or "", stat_pct=sp, role_score=rs)
         # Formula composite score (0-100): perf 20%, social 20%, school 15%, pos 12%, conf 8%, class 5%, recruit 20%
-        # ML-only features (collective, has_stats, is_QB, social_tier, social×nonQB) get 0 weight in display score
-        composite = sum(f * w for f, w in zip(fvec, [0.20, 0.20, 0.15, 0.12, 0.08, 0.05, 0.20, 0.0, 0.0, 0.0, 0.0]))
+        # ML-only features (collective, has_stats, is_QB, social_tier, stat_pct) get 0 weight in display score
+        composite = sum(f * w for f, w in zip(fvec, [0.20, 0.20, 0.15, 0.12, 0.08, 0.05, 0.20, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
         fvec_s    = _to_model_features(np.array(fvec))
         log_nil   = reg.predict([fvec_s])[0]
         # Base clip: $50K floor, $8M ceiling
@@ -505,6 +605,10 @@ def main():
         # (all curated labels have composite >= 50.5 in training).
         perf_val    = fvec[0]   # perf_score
         recruit_val = fvec[6]   # recruit_score
+        soc_raw     = fvec[1]   # social_score (0-100)
+        no_meaningful_stats = perf_val < 5
+        social_star = soc_raw >= 77  # ≈ 80K+ confirmed followers
+        pos = (player.position or "").upper()
         if composite < 42:
             nil_value = min(nil_value, 1_500_000)
         elif composite < 55:
@@ -514,7 +618,6 @@ def main():
             nil_value = min(nil_value, 2_000_000)
         # Position-group ceilings (Phase 2): non-QB positions have lower NIL ceilings.
         # Only the rarest exceptions (Jeremiah Smith-tier) exceed these.
-        pos = (player.position or "").upper()
         if pos in ("WR", "TE"):
             nil_value = min(nil_value, 4_000_000)   # elite WRs (Jeremiah Smith) can reach $4M+
         elif pos in ("RB",):
@@ -527,8 +630,132 @@ def main():
             nil_value = min(nil_value, 2_000_000)
         elif pos in ("CB", "S", "DB", "FS", "SS"):
             nil_value = min(nil_value, 1_500_000)
-        elif pos in ("K", "P", "PK", "LS", "ST"):  # PK = placekicker
+        elif pos in ("K", "P", "PK", "LS", "ST"):  # specialists rarely command big NIL
+            nil_value = min(nil_value, 150_000)
+
+        # Stat-percentile graduated ceilings for non-QB positions.
+        # Social stars get higher tier caps (brand boosts their value) but are NOT fully exempt.
+        # sp == 0 (no stats record) is handled by the no_meaningful_stats caps below.
+        if sp > 0 and pos in ("RB", "FB"):
+            if social_star:
+                if sp <= 25:   nil_value = min(nil_value,   600_000)
+                elif sp <= 55: nil_value = min(nil_value,   900_000)
+                elif sp <= 75: nil_value = min(nil_value, 1_200_000)
+                elif sp <= 89: nil_value = min(nil_value, 1_500_000)
+                # sp >= 90: elite social + elite stats — full RB ceiling ($2.5M)
+            else:
+                if sp <= 25:   nil_value = min(nil_value,   400_000)
+                elif sp <= 55: nil_value = min(nil_value,   600_000)
+                elif sp <= 75: nil_value = min(nil_value,   800_000)
+                elif sp <= 89: nil_value = min(nil_value, 1_100_000)
+                # sp >= 90: elite — full RB ceiling ($2.5M)
+        elif sp > 0 and pos in ("WR", "TE", "SLOT"):
+            if social_star:
+                if sp <= 25:   nil_value = min(nil_value,   700_000)
+                elif sp <= 55: nil_value = min(nil_value, 1_100_000)
+                elif sp <= 75: nil_value = min(nil_value, 1_500_000)
+                elif sp <= 89: nil_value = min(nil_value, 2_000_000)
+                # sp >= 90: elite — full WR ceiling ($4M)
+            else:
+                if sp <= 25:   nil_value = min(nil_value,   450_000)
+                elif sp <= 55: nil_value = min(nil_value,   700_000)
+                elif sp <= 75: nil_value = min(nil_value, 1_000_000)
+                elif sp <= 89: nil_value = min(nil_value, 1_400_000)
+                # sp >= 90: elite — full WR ceiling ($4M)
+        # Non-skill positions: brand value is limited even for social stars
+        elif sp > 0 and pos in ("OT", "OG", "OL", "C"):
+            nil_value = min(nil_value, 700_000 if social_star else 500_000)
+        elif sp > 0 and pos in ("DE", "DL", "DT", "NT", "EDGE"):
+            nil_value = min(nil_value, 900_000 if social_star else 600_000)
+        elif sp > 0 and pos in ("LB", "ILB", "OLB"):
+            nil_value = min(nil_value, 900_000 if social_star else 600_000)
+        elif sp > 0 and pos in ("CB", "S", "DB", "FS", "SS"):
+            nil_value = min(nil_value, 800_000 if social_star else 500_000)
+
+        # Social + starter floors: players with no market presence can't command real deals.
+        # Follower-count calibration (soc_raw → approximate real followers):
+        #   soc_raw 35 ≈ 200 followers   — essentially invisible
+        #   soc_raw 55 ≈ 2,500 followers — tiny local following
+        #   soc_raw 70 ≈ 22,000 followers — small but real presence
+        #   soc_raw 80 ≈ 97,000 followers — meaningful brand (~100K)
+        # NIL market reality: <10K followers + no meaningful stats ≈ no real market.
+        # (soc_raw, no_meaningful_stats, social_star already defined above)
+        if no_meaningful_stats and soc_raw == 0:
+            # Elite recruits without social still have real market value from their football brand
+            if recruit_val >= 85:
+                nil_value = min(nil_value, 700_000)   # 5-star, no stats yet, no social
+            elif recruit_val >= 60:
+                nil_value = min(nil_value, 200_000)   # 4-star, no stats, no social
+            else:
+                nil_value = min(nil_value, 80_000)    # walk-on/unrated, invisible
+        elif no_meaningful_stats and soc_raw < 55:
+            if recruit_val >= 85:
+                nil_value = min(nil_value, 700_000)   # elite recruit + tiny following
+            else:
+                nil_value = min(nil_value, 100_000)   # <2,500 followers + no production
+        elif no_meaningful_stats and soc_raw < 70:
+            nil_value = min(nil_value, 200_000)       # <22K followers, minimal market
+        elif no_meaningful_stats and soc_raw < 77:
+            nil_value = min(nil_value, 400_000)       # <80K followers, some market
+        # Social stars with NO football profile (0 perf + no elite recruit):
+        # big social following alone doesn't justify $1.5-2M without any production or prestige.
+        elif social_star and no_meaningful_stats and recruit_val < 60:
+            nil_value = min(nil_value, 800_000)       # social-only, no football value
+        elif social_star and no_meaningful_stats and recruit_val < 85:
+            nil_value = min(nil_value, 1_200_000)     # social + elite recruit, no stats yet
+        # Zero social = essentially no NIL market regardless of stats below starter level
+        # Exempt elite recruits — their football brand compensates for missing social data
+        if soc_raw == 0 and perf_val < 30 and recruit_val < 85:
+            nil_value = min(nil_value, 150_000)
+        # Confirmed low-follower cap: when we KNOW a player has a tiny following, they lack
+        # the brand market for significant NIL regardless of stats.
+        # soc_raw == 0 means missing data (may have real followers), so we only cap when
+        # soc_raw is confirmed low (> 0 but below threshold).
+        #   soc_raw < 58  ≈ confirmed < 5K followers  → very limited brand market
+        #   soc_raw < 62  ≈ confirmed < 10K followers → small but real local following
+        if 0 < soc_raw < 58:
+            nil_value = min(nil_value, 200_000)
+        elif 0 < soc_raw < 62:
+            nil_value = min(nil_value, 250_000)
+        # Non-QB skill positions with minimal/no stats: social alone doesn't make NIL.
+        # Exception: social stars (80K+ followers) can command brand deals without production.
+        if pos in ("RB", "FB") and no_meaningful_stats and not social_star:
+            nil_value = min(nil_value, 400_000)
+        elif pos in ("WR", "TE", "SLOT") and no_meaningful_stats and not social_star:
+            nil_value = min(nil_value, 400_000)
+        # Non-skill positions with no stats: NIL is driven mainly by school + social,
+        # but fans don't buy jerseys for OL/DL — hard cap even for social stars.
+        #   social_star exempt: skill positions only (WR/RB/TE can model brand deals)
+        #   OL/DL/LB: cap applies even with big following — production still required
+        if pos in ("OT", "OG", "OL", "C") and no_meaningful_stats:
+            nil_value = min(nil_value, 500_000)    # social star OL can still get brand deals up to ~$500K
+        elif pos in ("DE", "DL", "DT", "NT", "EDGE") and no_meaningful_stats:
+            nil_value = min(nil_value, 600_000)
+        elif pos in ("LB", "ILB", "OLB") and no_meaningful_stats:
+            nil_value = min(nil_value, 600_000)
+        elif pos in ("CB", "S", "DB", "FS", "SS") and no_meaningful_stats and not social_star:
+            nil_value = min(nil_value, 200_000)
+        # QB-specific caps: backup/minimal-starter QBs carry far less NIL than starters.
+        # Prevents walk-on/3rd-string QBs from hitting the $2M+ composite cap.
+        if pos == "QB" and soc_raw == 0:
+            # No social presence at all → tiny market regardless of school/position
+            nil_value = min(nil_value, 200_000)
+        elif pos == "QB" and perf_val == 0 and soc_raw < 50:
+            nil_value = min(nil_value, 500_000)
+        # No-production QB cap: even high-social QBs need real college reps to
+        # justify $1.5M+. Exception: Arch Manning-level players are in curated labels
+        # so the regression handles them — this cap only affects prediction players.
+        if pos == "QB" and no_meaningful_stats:
             nil_value = min(nil_value, 1_000_000)
+        # role_score-based QB cap: applies even if player has a few stats (true backups).
+        # role_score < 10 ≈ < 30 pass attempts (spot duty / garbage time only).
+        # role_score < 25 ≈ < 75 pass attempts (clear backup, < 6 games worth).
+        # Exemption: elite social (soc_raw >= 80) captures high-brand non-starters
+        #   like Arch Manning who command huge NIL before ever starting.
+        if pos == "QB" and rs < 10 and soc_raw < 80:
+            nil_value = min(nil_value, 700_000)
+        elif pos == "QB" and rs < 25 and soc_raw < 75:
+            nil_value = min(nil_value, 1_500_000)
         nil_value = round(nil_value, 2)
 
         results.append({
@@ -566,6 +793,22 @@ def main():
     print(f"  Max:    ${df['nil_value'].max():>12,.0f}")
     print(f"  Median: ${df['nil_value'].median():>12,.0f}")
     print(f"  Min:    ${df['nil_value'].min():>12,.0f}")
+
+    # Distribution sanity check — realistic NIL market breakdown
+    print(f"\n  Value distribution across all {len(df):,} predictions:")
+    dist_bands = [
+        (">$2.5M",    2_500_000, float("inf")),
+        ("$1M-$2.5M", 1_000_000, 2_500_000),
+        ("$500K-$1M",   500_000, 1_000_000),
+        ("$200K-$500K", 200_000,   500_000),
+        ("$50K-$200K",   50_000,   200_000),
+        ("<$50K",             0,    50_000),
+    ]
+    for label, lo, hi in dist_bands:
+        cnt  = ((df["nil_value"] >= lo) & (df["nil_value"] < hi)).sum()
+        pct  = cnt / len(df) * 100
+        bar  = "█" * int(pct / 2)
+        print(f"    {label:<14}: {cnt:>5,}  ({pct:4.1f}%)  {bar}")
 
     # Save calibration — store the scaler and raw inter_pairs/build info for reloading
     with open(CAL_PATH, "wb") as f:
