@@ -227,7 +227,7 @@
     "name": "Marcel Reed",
     "school": "Texas A&M",
     "position": "QB",
-    "nil_value": 2100000,
+    "nil_value": 3500000,
     "source": "web_2025"
   },
   {
@@ -340,42 +340,28 @@
     "school": "Texas",
     "position": "QB",
     "nil_value": 4500000,
-    "source": "web_search_2025"
+    "source": "ai_search_2025"
   },
   {
     "name": "Quinshon Judkins",
     "school": "Ohio State",
     "position": "RB",
     "nil_value": 1100000,
-    "source": "web_search_2025"
+    "source": "ai_search_2025"
   },
   {
     "name": "Shedeur Sanders",
     "school": "Colorado",
     "position": "QB",
     "nil_value": 5100000,
-    "source": "web_search_2025"
+    "source": "ai_search_2025"
   },
   {
     "name": "Kyren Lacy",
     "school": "LSU",
     "position": "WR",
     "nil_value": 1000000,
-    "source": "web_search_2025"
-  },
-  {
-    "name": "Arch Manning IV",
-    "school": "Texas",
-    "position": "QB",
-    "nil_value": 2000000,
-    "source": "web_search_2025"
-  },
-  {
-    "name": "Miller Moss",
-    "school": "USC",
-    "position": "QB",
-    "nil_value": 1200000,
-    "source": "web_search_2025"
+    "source": "ai_search_2025"
   },
   {
     "name": "Jordyn Tyson",
@@ -389,7 +375,7 @@
     "school": "Oregon",
     "position": "QB",
     "nil_value": 1000000,
-    "source": "web_search_2025"
+    "source": "ai_search_2025"
   },
   {
     "name": "Justin Ball",
@@ -480,6 +466,258 @@
     "school": "Notre Dame",
     "position": "CB",
     "nil_value": 822000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Ollie Gordon II",
+    "school": "Oklahoma State",
+    "position": "RB",
+    "nil_value": 1200000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "TreVeyon Henderson",
+    "school": "Ohio State",
+    "position": "RB",
+    "nil_value": 800000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Donovan Edwards",
+    "school": "Michigan",
+    "position": "RB",
+    "nil_value": 850000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Tahj Brooks",
+    "school": "Texas Tech",
+    "position": "RB",
+    "nil_value": 600000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Kameron Davis",
+    "school": "Georgia",
+    "position": "RB",
+    "nil_value": 175000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Justice Haynes",
+    "school": "Alabama",
+    "position": "RB",
+    "nil_value": 250000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Logan Diggs",
+    "school": "Notre Dame",
+    "position": "RB",
+    "nil_value": 275000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Sedrick Van Pran",
+    "school": "Georgia",
+    "position": "C",
+    "nil_value": 500000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Tate Ratledge",
+    "school": "Georgia",
+    "position": "OG",
+    "nil_value": 450000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Isaiah Bond",
+    "school": "Texas",
+    "position": "WR",
+    "nil_value": 700000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Matthew Golden",
+    "school": "Texas",
+    "position": "WR",
+    "nil_value": 900000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Anthony Adkins",
+    "school": "UCLA",
+    "position": "RB",
+    "nil_value": 750000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Myles Montgomery",
+    "school": "UCF",
+    "position": "RB",
+    "nil_value": 400000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Jordan James",
+    "school": "Oregon",
+    "position": "RB",
+    "nil_value": 2200000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Tyler Shough",
+    "school": "Louisville",
+    "position": "QB",
+    "nil_value": 1000000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Jam Miller",
+    "school": "Alabama",
+    "position": "RB",
+    "nil_value": 300000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Keilan Robinson",
+    "school": "Texas",
+    "position": "RB",
+    "nil_value": 175000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Armoni Goodwin",
+    "school": "Georgia",
+    "position": "RB",
+    "nil_value": 150000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Kimani Vidal",
+    "school": "TCU",
+    "position": "RB",
+    "nil_value": 425000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "GaQuincy McKinstry",
+    "school": "Alabama",
+    "position": "CB",
+    "nil_value": 500000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Chimere Dike",
+    "school": "Wisconsin",
+    "position": "WR",
+    "nil_value": 375000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Holden Staes",
+    "school": "Tennessee",
+    "position": "TE",
+    "nil_value": 2300000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Ryan Wingo",
+    "school": "Texas",
+    "position": "WR",
+    "nil_value": 1500000,
+    "source": "web_search_2025"
+  },
+  {
+    "name": "Raheim Sanders",
+    "school": "South Carolina",
+    "position": "RB",
+    "nil_value": 327000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Jalon Daniels",
+    "school": "Kansas",
+    "position": "QB",
+    "nil_value": 400000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Jake Merklinger",
+    "school": "Tennessee",
+    "position": "QB",
+    "nil_value": 323000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Cam Rising",
+    "school": "Utah",
+    "position": "QB",
+    "nil_value": 550000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Rocco Becht",
+    "school": "Iowa State",
+    "position": "QB",
+    "nil_value": 650000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Emeka Egbuka",
+    "school": "Ohio State",
+    "position": "WR",
+    "nil_value": 950000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Graham Mertz",
+    "school": "Florida",
+    "position": "QB",
+    "nil_value": 821000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Nick Singleton",
+    "school": "Penn State",
+    "position": "RB",
+    "nil_value": 1300000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Kyle Monangai",
+    "school": "Rutgers",
+    "position": "RB",
+    "nil_value": 600000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Kyle McCord",
+    "school": "Syracuse",
+    "position": "QB",
+    "nil_value": 900000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Devin Neal",
+    "school": "Kansas",
+    "position": "RB",
+    "nil_value": 375000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Sam Hartman",
+    "school": "Notre Dame",
+    "position": "QB",
+    "nil_value": 900000,
+    "source": "ai_search_2025"
+  },
+  {
+    "name": "Jordan Whittington",
+    "school": "Texas",
+    "position": "WR",
+    "nil_value": 274000,
     "source": "ai_search_2025"
   }
 ]
