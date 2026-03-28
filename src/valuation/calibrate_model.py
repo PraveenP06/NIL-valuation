@@ -278,6 +278,20 @@ def main():
     p_by_ns,       p_by_name       = _build_lookups(players)
     p_by_ns_other, p_by_name_other = _build_lookups(players_other)
 
+    # Build (name, school) → best stats lookup across ALL player records and seasons.
+    # Prefers higher total_yards so players whose stats landed on the wrong season/player_id
+    # (ingestion matching bug) still get their production counted. Also ensures 2025 stats
+    # are used for players who played in both seasons (more recent = more current role).
+    stats_by_ns_2025: dict[tuple, object] = {}
+    for p in list(players) + list(players_other):
+        for s_dict in (stats_by_pid, stats_by_pid_other):   # both dicts: ingestion bug may
+            s = s_dict.get(p.id)                            # store 2024 stats on a 2025 pid
+            if s and (s.total_yards or 0) > 0:
+                key = (norm(p.name), norm(p.school or ""))
+                existing = stats_by_ns_2025.get(key)
+                if existing is None or (s.total_yards or 0) > (existing.total_yards or 0):
+                    stats_by_ns_2025[key] = s
+
     # Build name→social lookup so 2025 players missing social can use their 2024 row
     social_by_name: dict[str, object] = {}
     all_players_by_pid = {p.id: p for p in all_players}
@@ -334,6 +348,14 @@ def main():
         # If no social for this player_id, fall back to any season's data by name
         if social is None or (social.total_followers or 0) == 0:
             social = social_by_name.get(norm(player.name))
+
+        # Skip rank anchors for players who now have real stats — they have real signal
+        # and the anchor value ($180K-$1.5M) would conflict with their stat-based features,
+        # causing the model to learn near-zero weights for perf features.
+        src = lbl.get("source", "")
+        if src == "rank_anchor" and stats and (stats.total_yards or 0) > 0:
+            continue
+
         res    = estimate_nil_value(player, stats, social, base_value=100.0)
 
         sp   = _stat_percentile(player, stats, pos_arrays)
@@ -341,7 +363,6 @@ def main():
         fvec = _feature_vector(res, position=player.position or "", stat_pct=sp, role_score=rs)
         matched_features.append(fvec)
         matched_nil.append(lbl["nil_value"])
-        src = lbl.get("source", "")
         matched_meta.append({
             "player_id":    player.id,
             "name":         player.name,
@@ -352,14 +373,14 @@ def main():
             "actual_nil":   lbl["nil_value"],
             "source":       src,
             # Curated (web_2025) = 5×
-            # AI-verified (ai_search_2025) = 1× — reduced from 2× to prevent low-tier
-            #   labels from diluting elite accuracy. Curated labels (235 total weight)
-            #   need to dominate; low-tier caps handled via post-processing.
-            # rank-tier anchors = 0.2–1.0 (per-band, stored in _weight)
+            # AI-verified (ai_search_2025) = 1×
+            # rank-tier anchors = 0 — disabled now that defensive stats exist.
+            #   Anchors conflict with perf features for defensive players (anchor says $180K
+            #   but stats say "productive") → near-zero learned perf weights + low Spearman.
+            #   Post-processing caps enforce low-end floors without training signal.
             # DDG-scraped (web_search_2025) = 0 (not trusted yet)
             "weight":       5.0 if src == "web_2025" else (
-                            1.0 if src == "ai_search_2025" else (
-                            lbl.get("_weight", 1.0) if src == "rank_anchor" else 0.0)),
+                            1.0 if src == "ai_search_2025" else 0.0),
         })
 
     print(f"  Matched: {len(matched_meta)} players (including duplicates)")
@@ -584,6 +605,11 @@ def main():
         if getattr(player, "nfl_drafted_2024", False):
             continue
         stats  = stats_by_pid.get(player.id)
+        # Prefer 2025 stats when available — more recent season reflects current role better
+        ns_key = (norm(player.name), norm(player.school or ""))
+        stats_2025 = stats_by_ns_2025.get(ns_key)
+        if stats_2025 and (stats_2025.total_yards or 0) > ((stats.total_yards or 0) if stats else 0):
+            stats = stats_2025
         social = social_by_pid.get(player.id)
         if social is None or (social.total_followers or 0) == 0:
             social = social_by_name.get(norm(player.name))
@@ -662,15 +688,17 @@ def main():
                 elif sp <= 75: nil_value = min(nil_value, 1_000_000)
                 elif sp <= 89: nil_value = min(nil_value, 1_400_000)
                 # sp >= 90: elite — full WR ceiling ($4M)
-        # Non-skill positions: brand value is limited even for social stars
-        elif sp > 0 and pos in ("OT", "OG", "OL", "C"):
+        # Non-skill positions: sp is always 0 for defensive/OL players (not in _SKILL_POSITIONS),
+        # so use perf_val > 0 (has any stats record) as the "has production" gate instead.
+        elif not no_meaningful_stats and pos in ("OT", "OG", "OL", "C"):
             nil_value = min(nil_value, 700_000 if social_star else 500_000)
-        elif sp > 0 and pos in ("DE", "DL", "DT", "NT", "EDGE"):
+        elif not no_meaningful_stats and pos in ("DE", "DL", "DT", "NT", "EDGE"):
             nil_value = min(nil_value, 900_000 if social_star else 600_000)
-        elif sp > 0 and pos in ("LB", "ILB", "OLB"):
+        elif not no_meaningful_stats and pos in ("LB", "ILB", "OLB"):
             nil_value = min(nil_value, 900_000 if social_star else 600_000)
-        elif sp > 0 and pos in ("CB", "S", "DB", "FS", "SS"):
-            nil_value = min(nil_value, 800_000 if social_star else 500_000)
+        elif not no_meaningful_stats and pos in ("CB", "S", "DB", "FS", "SS"):
+            # Elite safeties (Caleb Downs tier: $1.6M-$2.4M real) can reach $1.5M
+            nil_value = min(nil_value, 1_500_000 if social_star else 500_000)
 
         # Social + starter floors: players with no market presence can't command real deals.
         # Follower-count calibration (soc_raw → approximate real followers):

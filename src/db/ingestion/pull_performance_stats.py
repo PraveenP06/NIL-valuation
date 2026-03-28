@@ -91,7 +91,10 @@ def ingest_performance_stats(year, max_rows=None):
         name_key = normalize_player_name(player.name or "")
         school_key = normalize_text(player.school or "")
         if name_key and school_key:
-            players_by_name_school[(name_key, school_key)] = player
+            existing = players_by_name_school.get((name_key, school_key))
+            # Prefer the player record whose season matches the ingestion year
+            if not existing or player.season == year:
+                players_by_name_school[(name_key, school_key)] = player
         if name_key:
             players_by_name_only[name_key].append(player)
 
@@ -123,8 +126,9 @@ def ingest_performance_stats(year, max_rows=None):
             stat_value = 0.0
 
         entry = aggregated[key]
-        # Only count offensive categories
         offensive = category in {"passing", "rushing", "receiving"}
+        defensive = category == "defensive"
+
         if stat_type == "YDS" and offensive:
             entry["total_yards"] += stat_value
         elif stat_type == "TD" and offensive:
@@ -133,6 +137,22 @@ def ingest_performance_stats(year, max_rows=None):
             entry["attempts"] += int(stat_value)
         elif stat_type in {"G", "GP", "GAMES"}:
             entry["games_played"] = max(entry["games_played"], int(stat_value))
+        # Defensive stats → production equivalent stored in total_yards
+        # Weights chosen so a solid starter (~80 tackles, 3 sacks) ≈ 500 units,
+        # comparable to a WR with 400-500 receiving yards. Position-percentile
+        # normalization in model.py keeps defenders ranked against defenders only.
+        elif defensive and stat_type in {"TOT", "TACKLES"}:
+            entry["def_tackles"] = entry.get("def_tackles", 0.0) + stat_value
+        elif defensive and stat_type == "SOLO":
+            entry["def_solo"] = entry.get("def_solo", 0.0) + stat_value
+        elif defensive and stat_type in {"SACKS", "SACK"}:
+            entry["def_sacks"] = entry.get("def_sacks", 0.0) + stat_value
+        elif defensive and stat_type in {"TFL", "TFLS", "TFL-YDS"}:
+            entry["def_tfl"] = entry.get("def_tfl", 0.0) + stat_value
+        elif defensive and stat_type in {"INT", "INTS"}:
+            entry["def_int"] = entry.get("def_int", 0.0) + stat_value
+        elif defensive and stat_type in {"PD", "PBU", "PASS BREAKUPS"}:
+            entry["def_pd"] = entry.get("def_pd", 0.0) + stat_value
 
     print(f"🔎 Aggregated into {len(aggregated)} player-team stat profiles")
 
@@ -160,10 +180,28 @@ def ingest_performance_stats(year, max_rows=None):
             total_attempts = data["attempts"]
             games_played = data["games_played"]
 
-            # Skip players with no meaningful offensive stats
-            if total_yards == 0 and total_tds == 0 and total_attempts == 0:
+            # Compute defensive production equivalent
+            def_tackles = data.get("def_tackles", 0.0) or data.get("def_solo", 0.0)
+            def_sacks    = data.get("def_sacks", 0.0)
+            def_tfl      = data.get("def_tfl", 0.0)
+            def_int      = data.get("def_int", 0.0)
+            def_pd       = data.get("def_pd", 0.0)
+            def_prod = (def_tackles * 5.0 + def_sacks * 40.0 +
+                        def_tfl * 15.0 + def_int * 60.0 + def_pd * 12.0)
+
+            has_offense = total_yards > 0 or total_tds > 0 or total_attempts > 0
+            has_defense = def_prod > 0
+
+            # Skip players with no meaningful stats of any kind
+            if not has_offense and not has_defense:
                 unmatched += 1
                 continue
+
+            # For purely defensive players, store def_prod as total_yards
+            if not has_offense and has_defense:
+                total_yards = def_prod
+                total_tds = 0
+                total_attempts = 0
 
             yards_per_game = (total_yards / games_played) if games_played > 0 else None
             efficiency_metric = (total_yards / total_attempts) if total_attempts > 0 else None
