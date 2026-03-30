@@ -295,6 +295,11 @@ def estimate_nil_value(
     school_score     = calculate_school_score(player)
     class_score      = calculate_class_year_score(player)
     recruit_score    = calculate_recruit_score(player)
+    # Recruit prestige decays by class year — a 5-star matters most as a freshman
+    # (brand/name value before college production exists) and fades as on-field
+    # production becomes the dominant signal by junior/senior year.
+    _cy = getattr(player, "class_year", None)
+    recruit_score = round(recruit_score * {1: 1.0, 2: 0.75, 3: 0.40, 4: 0.20}.get(_cy, 0.50), 2)
     collective_score = calculate_collective_score(player)
     pos_mult         = get_position_multiplier(player.position)
     conf_mult        = get_conference_multiplier(player.conference)

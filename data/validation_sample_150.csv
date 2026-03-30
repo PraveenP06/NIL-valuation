@@ -1,0 +1,151 @@
+tier,name,school,position,conference,class_year,nil_value,perf_score,social_score,recruit_score,formula_score
+high,DJ Lagway,Florida,QB,SEC,2.0,"$4,066,526",68.8,80.7,75,82.7
+high,Cam Coleman,Auburn,WR,SEC,2.0,"$1,666,977",33.3,80.5,75,71.0
+high,Jadan Baugh,Florida,RB,SEC,2.0,"$1,833,074",48.2,70.4,56,65.2
+high,Mekhi Mews,Houston,WR,Big 12,4.0,"$872,520",16.6,64.0,4,41.8
+high,Brett Seither,Georgia Tech,TE,ACC,4.0,"$936,610",11.8,64.0,4,39.7
+high,LJ Johnson Jr.,SMU,RB,ACC,4.0,"$800,000",17.5,62.4,4,39.0
+high,KJ Bolden,Georgia,DB,SEC,2.0,"$1,500,000",26.8,79.7,75,63.6
+high,Deamonte Trayanum,Kentucky,,SEC,,"$952,858",51.5,68.8,10,53.1
+high,Maliq Carr,Houston,TE,Big 12,4.0,"$1,000,000",7.9,66.0,4,39.0
+high,Christian Bentancur,Clemson,TE,ACC,1.0,"$1,400,000",13.3,63.1,75,56.2
+high,Randy Pittman Jr.,UCF,TE,Big 12,3.0,"$960,904",17.2,67.5,18,44.7
+high,Jahdae Walker,Texas A&M,WR,SEC,4.0,"$1,302,612",27.1,77.2,4,55.2
+high,Parker Livingstone,Texas,WR,SEC,1.0,"$1,400,000",49.9,72.9,75,71.8
+high,Marlin Klein,Michigan,TE,Big Ten,4.0,"$1,066,403",9.8,67.7,4,46.7
+high,Treshaun Ward,Boston College,RB,ACC,4.0,"$923,715",26.1,64.9,4,41.7
+high,Izayah Cummings,Louisville,TE,ACC,4.0,"$937,400",13.6,65.4,4,40.8
+high,Jacolby Criswell,North Carolina,QB,ACC,4.0,"$1,400,000",70.6,69.7,4,59.1
+high,Miller Moss,USC,QB,Big Ten,4.0,"$3,268,924",73.9,71.2,15,68.4
+high,Sawyer Robertson,Baylor,QB,Big 12,4.0,"$1,400,000",73.9,68.1,4,58.6
+high,Money Parks,Utah,WR,Big 12,4.0,"$1,000,000",38.3,71.5,4,46.9
+high,Arch Manning IV,Texas,QB,SEC,2.0,"$5,963,811",74.0,92.5,75,86.0
+high,Chauncey Bowens,Georgia,RB,SEC,1.0,"$1,100,000",24.3,70.0,75,63.1
+high,Jaylin Lucas,Florida State,RB,ACC,3.0,"$800,000",10.1,65.0,8,43.1
+high,Raheim Sanders,South Carolina,RB,SEC,4.0,"$1,184,023",49.1,73.3,15,55.0
+high,Billy Edwards Jr.,Maryland,QB,Big Ten,4.0,"$1,400,000",73.8,62.9,4,61.6
+high,Rocco Becht,Iowa State,QB,Big 12,3.0,"$1,400,000",74.0,73.1,8,61.2
+high,Maalik Murphy,Duke,QB,ACC,3.0,"$1,400,000",73.9,73.2,30,66.4
+high,C.J. Williams,Wisconsin,WR,Big Ten,4.0,"$984,950",12.1,67.8,4,48.7
+high,Chris Hilton Jr.,LSU,WR,SEC,4.0,"$1,000,000",14.2,75.4,15,54.4
+high,Ben Marshall,California,TE,ACC,2.0,"$800,000",1.1,87.5,15,44.2
+high,Dilin Jones,Wisconsin,RB,Big Ten,1.0,"$800,000",11.0,64.8,75,57.8
+high,Nate Frazier,Georgia,RB,SEC,2.0,"$1,599,514",36.1,75.7,56,63.9
+high,Malachi Thomas,Pittsburgh,TE,ACC,2.0,"$1,000,000",10.4,63.9,15,41.8
+high,Ethan Garbers,UCLA,QB,Big Ten,4.0,"$1,400,000",68.9,65.1,4,61.4
+high,Jamal Haynes,Georgia Tech,RB,ACC,4.0,"$912,676",45.3,73.6,4,46.8
+high,Diego Pavia,Vanderbilt,QB,SEC,4.0,"$1,400,000",74.1,80.2,4,66.6
+high,Jordan McDonald,Boston College,RB,ACC,4.0,"$800,000",21.4,63.6,4,40.5
+high,Fernando Mendoza,California,QB,ACC,3.0,"$2,104,922",72.2,95.9,8,65.7
+high,Brock Glenn,Florida State,QB,ACC,2.0,"$1,400,000",22.6,71.5,34,58.5
+high,Jonah Coleman,Washington,RB,Big Ten,4.0,"$1,216,507",44.8,85.5,4,53.2
+high,Zeon Chriss,Houston,QB,Big 12,3.0,"$1,366,988",41.3,76.2,8,55.2
+high,Lawrence Arnold,Kansas,WR,Big 12,4.0,"$844,329",37.8,66.0,4,46.5
+high,Haynes King,Georgia Tech,QB,ACC,4.0,"$1,400,000",74.0,72.6,4,59.9
+high,Jaylon Glover,Utah,RB,Big 12,2.0,"$800,000",12.2,67.9,56,48.2
+high,Corey Kiner,Cincinnati,RB,Big 12,4.0,"$889,698",35.4,69.9,15,46.0
+high,Ryan Wingo,Texas,WR,SEC,2.0,"$1,710,867",44.1,74.1,56,68.1
+high,Robby Ashford,South Carolina,QB,SEC,4.0,"$1,500,000",19.7,73.2,4,54.4
+high,Chris Davis Jr.,Stanford,RB,ACC,2.0,"$800,000",11.1,68.0,34,44.6
+high,Germie Bernard,Alabama,WR,SEC,4.0,"$1,325,468",42.7,76.6,4,58.2
+high,KJ Jackson,Arkansas,QB,SEC,1.0,"$1,400,000",20.0,67.7,75,66.3
+mid,Johnny Thompson Jr.,Kansas,RB,Big 12,2.0,"$200,000",3.3,62.8,15,37.9
+mid,Timmy Ward,Rutgers,DB,Big Ten,4.0,"$200,000",1.4,58.6,4,35.7
+mid,Hevin Brown-Shuler,Clemson,DT,ACC,1.0,"$200,000",1.1,64.6,75,50.4
+mid,Trevor Rogers,California,WR,ACC,1.0,"$200,000",0.9,61.3,75,51.4
+mid,Kendel Dolby,Oklahoma,DB,SEC,4.0,"$240,000",6.5,60.7,4,41.7
+mid,Andrel Anthony,Oklahoma,WR,SEC,4.0,"$400,000",0.2,76.6,15,51.9
+mid,Tony Rojas,Penn State,LB,Big Ten,3.0,"$450,000",27.0,71.8,30,53.9
+mid,Amir Jackson,Florida,TE,SEC,1.0,"$200,000",3.2,60.3,75,58.4
+mid,Devin Mockobee,Purdue,RB,Big Ten,4.0,"$675,850",28.2,62.8,9,45.9
+mid,Jamaal Bell,Baylor,WR,Big 12,4.0,"$200,000",2.4,60.3,4,38.2
+mid,Brice Turner,Nebraska,DB,Big Ten,2.0,"$200,000",1.1,63.8,15,38.6
+mid,Cataurus Hicks,Louisville,WR,ACC,2.0,"$700,000",8.3,62.8,34,46.4
+mid,Mekhi Nelson,Nebraska,RB,Big Ten,1.0,"$240,000",10.1,61.9,45,48.0
+mid,Tomiwa Durojaiye,Florida State,DL,ACC,3.0,"$200,000",3.9,59.7,8,38.5
+mid,Roger Saleapaga,Oregon,TE,Big Ten,2.0,"$240,000",5.7,60.9,56,54.7
+mid,Keaten Wade,Colorado,DE,Big 12,4.0,"$350,000",26.8,65.6,4,38.2
+mid,Dorian Singer,Utah,WR,Big 12,4.0,"$722,826",23.6,69.4,4,43.5
+mid,Zakee Wheatley,Penn State,S,Big Ten,4.0,"$500,000",30.9,71.7,15,49.4
+mid,Monte Harrison,Arkansas,WR,SEC,2.0,"$200,000",1.6,67.2,15,47.0
+mid,Maurice Brown II,South Carolina,TE,SEC,3.0,"$200,000",1.3,68.7,8,45.4
+mid,Maurice Davis,Louisville,DL,ACC,1.0,"$200,000",2.1,59.8,20,35.6
+mid,Kadyn Proctor,Alabama,OL,SEC,3.0,"$500,000",1.2,80.6,40,55.6
+mid,Michael Merdinger,North Carolina,QB,ACC,1.0,"$240,000",12.4,58.0,45,52.0
+mid,Troy Omeire,Arizona State,WR,Big 12,4.0,"$330,000",27.2,58.9,4,42.2
+mid,Joshua Harris,North Carolina,DL,ACC,4.0,"$350,000",12.3,74.4,4,38.6
+mid,Myles Price,Indiana,WR,Big Ten,4.0,"$739,777",28.5,67.3,4,48.9
+mid,Kole Taylor,West Virginia,TE,Big 12,4.0,"$330,000",20.4,60.8,4,40.4
+mid,Quincy Rhodes Jr.,Arkansas,DL,SEC,3.0,"$350,000",42.6,63.5,30,53.2
+mid,Deuce Spurlock,Florida,LB,SEC,3.0,"$200,000",3.9,65.9,18,47.3
+mid,Perry Thompson,Auburn,WR,SEC,2.0,"$700,000",8.6,71.4,56,60.5
+mid,Chauncey Magwood,UCF,WR,Big 12,4.0,"$240,000",5.7,60.0,4,38.8
+mid,KD Daniels,Florida,RB,SEC,1.0,"$600,000",5.4,66.3,75,58.6
+mid,Isaac Gifford,Nebraska,DB,Big Ten,4.0,"$200,000",0.4,63.0,4,36.4
+mid,Donavon Greene,Wake Forest,WR,ACC,4.0,"$330,000",18.3,58.8,4,41.9
+mid,Tony-Louis Nkuba,Arizona State,DB,Big 12,1.0,"$200,000",2.3,61.1,20,33.6
+mid,Hank Beatty,Illinois,WR,Big Ten,4.0,"$330,000",43.2,61.8,9,51.7
+mid,Trey Krause,Kansas State,DB,Big 12,4.0,"$200,000",1.7,65.8,4,33.2
+mid,Jaylan Hornsby,Syracuse,WR,ACC,1.0,"$700,000",5.4,63.2,20,42.2
+mid,Javan Robinson,Arizona State,DB,Big 12,3.0,"$240,000",19.1,61.4,8,36.6
+mid,Shawn Asbury II,Indiana,DB,Big Ten,4.0,"$240,000",28.9,58.6,9,42.2
+mid,Marque Collins,BYU,CB,Big 12,4.0,"$240,000",13.1,58.0,4,33.9
+mid,Suderian Harrison,Virginia,WR,ACC,3.0,"$700,000",16.8,64.7,8,44.4
+mid,Jeremiah Charles,Nebraska,DB,Big Ten,2.0,"$200,000",3.4,69.5,34,44.0
+mid,Da'Wain Lofton,Oklahoma State,WR,Big 12,4.0,"$240,000",7.8,58.4,4,38.9
+mid,Dashawn Spears,LSU,S,SEC,2.0,"$500,000",13.8,69.5,56,55.2
+mid,Jayden McGowan,Boston College,WR,ACC,4.0,"$200,000",1.7,58.3,9,39.5
+mid,Jordyn Bridgewater,UCF,WR,Big 12,1.0,"$200,000",0.7,59.2,45,44.6
+mid,Evan Johnson,BYU,CB,Big 12,3.0,"$500,000",20.2,62.4,8,37.8
+mid,Jamal Roberts,Missouri,RB,SEC,2.0,"$330,000",32.5,59.8,15,48.7
+mid,Nitro Tuggle,Georgia,WR,SEC,2.0,"$400,000",1.9,70.4,56,59.0
+low,Kendy Charles,Duke,DT,ACC,4.0,"$175,000",24.8,52.8,4,36.8
+low,Joshua Manning,Missouri,WR,SEC,3.0,"$175,000",36.9,46.4,30,53.9
+low,Coben Bourguet,Arizona State,WR,Big 12,4.0,"$100,000",0.4,54.0,4,35.8
+low,Tyler Morris,Michigan,WR,Big Ten,4.0,"$175,000",35.7,46.3,15,51.3
+low,Raleigh Collins III,West Virginia,S,Big 12,3.0,"$100,000",0.6,23.2,18,28.0
+low,Donovan Delaney Jr.,Rutgers,RB,Big Ten,3.0,"$100,000",2.1,49.3,8,38.5
+low,Koa Eldredge,BYU,WR,Big 12,3.0,"$175,000",0.7,55.6,8,38.5
+low,Jovesa Damuni,BYU,RB,Big 12,1.0,"$175,000",6.2,53.6,45,41.6
+low,Roman Pitre,Arizona State,DL,Big 12,3.0,"$175,000",1.8,56.1,8,32.8
+low,Graham Friedrichsen,Iowa,WR,Big Ten,3.0,"$100,000",4.4,51.4,8,45.4
+low,Jaden Harrell,Iowa,LB,Big Ten,4.0,"$175,000",15.3,49.7,9,42.2
+low,Jacob Knuth,Kansas State,QB,Big 12,3.0,"$175,000",6.0,55.8,8,44.1
+low,LeVar Thornton Jr.,Baylor,CB,Big 12,2.0,"$175,000",12.6,45.2,56,41.4
+low,Jordan Bass,Pittsburgh,S,ACC,3.0,"$175,000",9.7,47.0,30,37.8
+low,Logan Brantley,Kansas,LB,Big 12,2.0,"$100,000",4.3,39.3,34,35.6
+low,Tucker Ashcraft,Wisconsin,TE,Big Ten,3.0,"$175,000",4.8,57.2,18,47.2
+low,Kade Welcher,Oklahoma State,S,Big 12,3.0,"$100,000",0.3,45.7,8,30.4
+low,Rex Van Wyhe,Kansas State,LB,Big 12,3.0,"$175,000",10.7,49.5,8,34.8
+low,Clayton Smith,Arizona State,DL,Big 12,4.0,"$175,000",19.6,47.9,4,33.2
+low,Jonah Wilson,Houston,WR,Big 12,2.0,"$100,000",3.2,47.8,56,46.1
+low,Cole Turner,Clemson,WR,ACC,3.0,"$175,000",18.9,40.0,18,44.8
+low,Henry Delp,Georgia,TE,SEC,1.0,"$100,000",1.0,55.0,20,45.9
+low,Sean Jackson,Auburn,RB,SEC,3.0,"$100,000",1.3,45.9,8,42.3
+low,Tony Mathis Jr.,Houston,RB,Big 12,4.0,"$100,000",2.6,51.7,9,34.6
+low,Sam Robinson,Rutgers,LB,Big Ten,2.0,"$100,000",3.8,47.1,34,41.1
+low,Wyatt Gilmore,Oklahoma,DL,SEC,1.0,"$100,000",3.3,54.4,75,53.5
+low,Jivan Baly,NC State,CB,ACC,1.0,"$175,000",2.5,55.8,20,33.7
+low,Grant Fielder,Florida State,DL,ACC,2.0,"$100,000",0.3,49.4,15,36.1
+low,Nick Levy,Purdue,LS,Big Ten,4.0,"$150,000",1.7,57.2,4,38.5
+low,Sam West,Indiana,TE,Big Ten,2.0,"$100,000",2.1,46.4,34,43.6
+low,Jason Reynolds II,Northwestern,LB,Big Ten,3.0,"$100,000",0.6,44.6,18,38.2
+low,Jesse Anderson,Pittsburgh,DB,ACC,2.0,"$100,000",2.5,49.4,15,32.8
+low,Carson Grove,Northwestern,WR,Big Ten,1.0,"$100,000",0.9,50.1,45,47.3
+low,Easton Miller,Iowa State,RB,Big 12,2.0,"$100,000",1.9,45.1,15,34.1
+low,Julien Randolph III,North Carolina,TE,ACC,2.0,"$100,000",4.6,35.5,34,38.7
+low,Justin Logan,Arkansas,LB,SEC,1.0,"$100,000",0.3,48.1,20,38.4
+low,Dashun Reeder,Northwestern,RB,Big Ten,1.0,"$175,000",8.0,51.2,20,40.9
+low,Jaiven Plummer,California,WR,ACC,2.0,"$175,000",4.9,56.5,15,40.3
+low,Zion Taylor,Georgia Tech,WR,ACC,2.0,"$175,000",6.2,57.4,15,40.7
+low,Jeff Roberson,Oklahoma State,LB,Big 12,4.0,"$175,000",29.9,56.2,4,38.4
+low,Jordan Lovett,Kentucky,DB,SEC,4.0,"$175,000",19.0,43.2,4,37.8
+low,Avery Dunn,Michigan State,DL,Big Ten,3.0,"$175,000",7.2,57.0,8,38.8
+low,Sam Hecht,Kansas State,OL,Big 12,4.0,"$100,000",0.3,47.5,4,32.2
+low,Zaire Patterson,Clemson,DE,ACC,4.0,"$175,000",0.3,56.0,15,37.7
+low,Kameron Howard,Alabama,DB,SEC,2.0,"$100,000",1.0,30.8,15,36.6
+low,Michael Reese,Duke,DE,ACC,4.0,"$175,000",22.6,48.4,4,35.5
+low,Garrison Butler,Cincinnati,DT,Big 12,1.0,"$175,000",1.0,55.2,45,38.6
+low,Devin Turner,Northwestern,S,Big Ten,4.0,"$175,000",17.4,40.1,4,35.7
+low,Cameron Harpole,Arizona State,TE,Big 12,4.0,"$175,000",5.2,55.9,4,35.7
+low,Mason Starling,California,WR,ACC,4.0,"$175,000",6.7,43.9,4,36.2

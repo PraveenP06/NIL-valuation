@@ -22,6 +22,8 @@ from db.connection import get_client
 load_dotenv()
 
 API_KEY  = os.getenv("CFB_API_KEY")
+if not API_KEY:
+    raise RuntimeError("CFB_API_KEY is not set. Add it to your .env file.")
 BASE_URL = "https://api.collegefootballdata.com"
 HEADERS  = {"Authorization": f"Bearer {API_KEY}"}
 
