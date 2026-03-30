@@ -41,14 +41,17 @@ def main():
         chunk = rows[i:i + args.batch_size]
         records = [
             {
-                "player_id":       int(r["player_id"]),
-                "season":          args.season,
-                "nil_value":       float(r["nil_value"]),
-                "perf_score":      float(r["perf_score"]) if r.get("perf_score") else None,
-                "social_score":    float(r["social_score"]) if r.get("social_score") else None,
-                "school_score":    float(r["school_score"]) if r.get("school_score") else None,
-                "position_mult":   float(r["position_mult"]) if r.get("position_mult") else None,
-                "conference_mult": float(r["conference_mult"]) if r.get("conference_mult") else None,
+                "player_id":        int(r["player_id"]),
+                "season":           args.season,
+                "nil_value":        float(r["nil_value"]),
+                "perf_score":       float(r["perf_score"])      if r.get("perf_score")      else None,
+                "social_score":     float(r["social_score"])    if r.get("social_score")    else None,
+                "school_score":     float(r["school_score"])    if r.get("school_score")    else None,
+                "class_score":      float(r["class_score"])     if r.get("class_score")     else None,
+                "recruit_score":    float(r["recruit_score"])   if r.get("recruit_score")   else None,
+                "collective_score": float(r["collective_score"])if r.get("collective_score")else None,
+                "position_mult":    float(r["position_mult"])   if r.get("position_mult")   else None,
+                "conference_mult":  float(r["conference_mult"]) if r.get("conference_mult") else None,
             }
             for r in chunk
         ]

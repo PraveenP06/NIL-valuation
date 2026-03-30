@@ -3,12 +3,10 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from api.limiter import limiter
 from db.connection import get_client
 
 router = APIRouter(prefix="/api/players", tags=["players"])
-limiter = Limiter(key_func=get_remote_address)
 client = get_client()
 
 
@@ -22,7 +20,7 @@ def search_players(
 ):
     query = (
         client.table("players")
-        .select("id, name, position, school, conference, class_year, season")
+        .select("id,name,position,school,conference,class_year,season")
         .ilike("name", f"%{q}%")
     )
     if season is not None:
@@ -32,8 +30,29 @@ def search_players(
     return {"data": rows, "query": q}
 
 
+@router.get("/{player_id}/valuation")
+@limiter.limit("60/minute")
+def get_player_valuation(request: Request, player_id: int, season: int = Query(2024)):
+    """Combined player + full score breakdown — used by the player detail page."""
+    rows = (
+        client.table("valuations_with_players")
+        .select("player_id,season,nil_value,perf_score,social_score,school_score,"
+                "class_score,recruit_score,collective_score,position_mult,conference_mult,"
+                "name,position,school,conference,class_year")
+        .eq("player_id", player_id)
+        .eq("season", season)
+        .limit(1)
+        .execute()
+        .data
+    )
+    if not rows:
+        raise HTTPException(status_code=404, detail="Player valuation not found")
+    return rows[0]
+
+
 @router.get("/{player_id}")
-def get_player(player_id: int):
+@limiter.limit("60/minute")
+def get_player(request: Request, player_id: int):
     rows = (
         client.table("players")
         .select("*")
