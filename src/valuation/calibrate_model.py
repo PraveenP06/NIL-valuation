@@ -822,20 +822,22 @@ def main():
         nil_value = round(nil_value, 2)
 
         results.append({
-            "player_id":      player.id,
-            "name":           player.name,
-            "school":         player.school,
-            "position":       player.position,
-            "conference":     player.conference,
-            "class_year":     getattr(player, "class_year", None),
-            "recruit_score":  round(res.get("recruit_score", 20.0), 2),
-            "formula_score":  round(composite, 2),
-            "nil_value":      nil_value,
-            "perf_score":     round(res["perf_score"], 2),
-            "social_score":   round(res["social_score"], 2),
-            "school_score":   round(res["school_score"], 2),
-            "position_mult":  res["position_mult"],
-            "conference_mult": res["conference_mult"],
+            "player_id":        player.id,
+            "name":             player.name,
+            "school":           player.school,
+            "position":         player.position,
+            "conference":       player.conference,
+            "class_year":       getattr(player, "class_year", None),
+            "recruit_score":    round(res.get("recruit_score", 20.0), 2),
+            "class_score":      round(res.get("class_score", 65.0), 2),
+            "collective_score": round(res.get("collective_score", 10.0), 2),
+            "formula_score":    round(composite, 2),
+            "nil_value":        nil_value,
+            "perf_score":       round(res["perf_score"], 2),
+            "social_score":     round(res["social_score"], 2),
+            "school_score":     round(res["school_score"], 2),
+            "position_mult":    res["position_mult"],
+            "conference_mult":  res["conference_mult"],
         })
 
     df = pd.DataFrame(results).sort_values("nil_value", ascending=False).reset_index(drop=True)
