@@ -78,6 +78,9 @@ class ValuationBase(BaseModel):
     perf_score: Optional[float] = None
     social_score: Optional[float] = None
     school_score: Optional[float] = None
+    class_score: Optional[float] = None
+    recruit_score: Optional[float] = None
+    collective_score: Optional[float] = None
     position_mult: Optional[float] = None
     conference_mult: Optional[float] = None
 
