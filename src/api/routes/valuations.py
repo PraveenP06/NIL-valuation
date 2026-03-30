@@ -2,11 +2,13 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from db.connection import get_client
 
 router = APIRouter(prefix="/api/valuations", tags=["valuations"])
-
+limiter = Limiter(key_func=get_remote_address)
 client = get_client()
 
 
@@ -21,7 +23,9 @@ def _fetch_valuations_page(query, limit: int, offset: int) -> list[dict]:
 
 
 @router.get("")
+@limiter.limit("60/minute")
 def list_valuations(
+    request: Request,
     season: int = Query(2024),
     position: str = Query(None),
     conference: str = Query(None),

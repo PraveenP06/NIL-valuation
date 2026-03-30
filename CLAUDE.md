@@ -7,6 +7,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **NEVER commit anything unless explicitly asked.** Do not run `git commit` under any circumstance unless the user directly says to commit.
 - **Always ask for confirmation before moving to the next step.** After completing any task or phase, stop and wait for approval before continuing.
 
+## Security Rules (Always Enforce)
+
+Before writing or modifying ANY code, check for these:
+
+- **No hardcoded secrets** — API keys, tokens, passwords must always come from `os.getenv()`. Never hardcode even in comments or examples.
+- **Validate env vars at startup** — Use `os.environ["KEY"]` (raises `KeyError`) or explicit null-check with a clear error message. Never let `None` silently pass through to an API header or DB call.
+- **Allowlist dynamic query params** — Any string passed to a DB `.order()`, `.eq()`, `.filter()` that comes from user input or a function parameter must be validated against a hardcoded allowlist before use.
+- **No `service_role` key in API routes** — The Supabase `service_role` key bypasses all RLS. It is for admin/ingestion scripts only. Public API routes must use the `anon` key.
+- **Rate limiting on all public API endpoints** — Any route reachable without authentication needs rate limiting (`slowapi` or `fastapi-limiter`). `allow_origins=["*"]` without rate limiting = open scraping target.
+- **Never log secrets** — Do not print or log API keys, tokens, or full request headers that contain auth credentials.
+
+When writing new ingestion scripts, DB functions, or API endpoints — run through this checklist before considering the task complete.
+
 ## Environment Setup
 
 ```bash

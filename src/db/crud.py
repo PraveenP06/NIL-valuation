@@ -120,8 +120,12 @@ def delete_performance_stats(stats_id: int) -> bool:
     response = client.table("performance_stats").delete().eq("id", stats_id).execute()
     return len(response.data) > 0 if response.data else True
 
+_VALID_METRICS = {"total_yards", "touchdowns", "efficiency_metric", "yards_per_game", "team_wins"}
+
 def get_top_performers_by_season(season: int, metric: str = "total_yards", limit: int = 10) -> List[PerformanceStats]:
     """Fetch top performers for a specific season by a given metric"""
+    if metric not in _VALID_METRICS:
+        raise ValueError(f"Invalid metric '{metric}'. Must be one of: {sorted(_VALID_METRICS)}")
     response = client.table("performance_stats").select("*").eq("season", season).order(metric, desc=True).limit(limit).execute()
 
     return [PerformanceStats(**stat) for stat in response.data] if response.data else []

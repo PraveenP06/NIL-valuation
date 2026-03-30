@@ -3,6 +3,7 @@ duckduckgo-search
 instaloader
 fastapi
 uvicorn[standard]
+slowapi
 certifi==2026.2.25
 scikit-learn
 scipy

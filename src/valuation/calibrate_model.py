@@ -634,6 +634,8 @@ def main():
         soc_raw     = fvec[1]   # social_score (0-100)
         no_meaningful_stats = perf_val < 5
         social_star = soc_raw >= 77  # ≈ 80K+ confirmed followers
+        collective_val   = res.get("collective_score", 10.0)
+        is_elite_program = collective_val >= 65   # Alabama, Georgia, Michigan, LSU, Texas, USC, Miami, etc.
         pos = (player.position or "").upper()
         if composite < 42:
             nil_value = min(nil_value, 1_500_000)
@@ -693,9 +695,25 @@ def main():
         elif not no_meaningful_stats and pos in ("OT", "OG", "OL", "C"):
             nil_value = min(nil_value, 700_000 if social_star else 500_000)
         elif not no_meaningful_stats and pos in ("DE", "DL", "DT", "NT", "EDGE"):
-            nil_value = min(nil_value, 900_000 if social_star else 600_000)
+            # Elite-program DL (Alabama, Georgia, Ohio State…) can command $900K with brand
+            # Mid-tier program DL capped lower — fans don't buy DL jerseys at Minnesota/Maryland
+            if social_star and is_elite_program:
+                nil_value = min(nil_value, 900_000)
+            elif social_star:
+                nil_value = min(nil_value, 600_000)
+            elif is_elite_program:
+                nil_value = min(nil_value, 500_000)
+            else:
+                nil_value = min(nil_value, 350_000)
         elif not no_meaningful_stats and pos in ("LB", "ILB", "OLB"):
-            nil_value = min(nil_value, 900_000 if social_star else 600_000)
+            if social_star and is_elite_program:
+                nil_value = min(nil_value, 900_000)
+            elif social_star:
+                nil_value = min(nil_value, 600_000)
+            elif is_elite_program:
+                nil_value = min(nil_value, 450_000)
+            else:
+                nil_value = min(nil_value, 300_000)
         elif not no_meaningful_stats and pos in ("CB", "S", "DB", "FS", "SS"):
             # Elite safeties (Caleb Downs tier: $1.6M-$2.4M real) can reach $1.5M
             nil_value = min(nil_value, 1_500_000 if social_star else 500_000)
@@ -742,9 +760,17 @@ def main():
         #   soc_raw < 58  ≈ confirmed < 5K followers  → very limited brand market
         #   soc_raw < 62  ≈ confirmed < 10K followers → small but real local following
         if 0 < soc_raw < 58:
-            nil_value = min(nil_value, 200_000)
+            # Confirmed very low followers — differentiate by starter role so featured
+            # starters don't cluster with backups at the same $200K ceiling
+            if sp >= 70 or rs >= 70:
+                nil_value = min(nil_value, 280_000)   # featured starter, tiny following
+            else:
+                nil_value = min(nil_value, 175_000)
         elif 0 < soc_raw < 62:
-            nil_value = min(nil_value, 250_000)
+            if sp >= 70 or rs >= 70:
+                nil_value = min(nil_value, 330_000)
+            else:
+                nil_value = min(nil_value, 240_000)
         # Non-QB skill positions with minimal/no stats: social alone doesn't make NIL.
         # Exception: social stars (80K+ followers) can command brand deals without production.
         if pos in ("RB", "FB") and no_meaningful_stats and not social_star:
@@ -782,8 +808,17 @@ def main():
         #   like Arch Manning who command huge NIL before ever starting.
         if pos == "QB" and rs < 10 and soc_raw < 80:
             nil_value = min(nil_value, 700_000)
-        elif pos == "QB" and rs < 25 and soc_raw < 75:
+        elif pos == "QB" and rs < 25 and soc_raw < 80:
+            nil_value = min(nil_value, 1_200_000)
+        elif pos == "QB" and rs < 40 and soc_raw < 75:
             nil_value = min(nil_value, 1_500_000)
+        # Non-elite collective cap: schools without serious NIL infrastructure (collective < 65)
+        # can't pay QBs $1.5M+ regardless of starting status. Big Ten membership alone doesn't
+        # mean the collective has the budget (e.g. Washington, Indiana, Rutgers, Maryland).
+        # Exemption: massive national social following (soc_raw >= 85 ≈ 300K+ followers)
+        # implies brand deals beyond the collective.
+        if pos == "QB" and not is_elite_program and soc_raw < 85:
+            nil_value = min(nil_value, 1_400_000)
         nil_value = round(nil_value, 2)
 
         results.append({

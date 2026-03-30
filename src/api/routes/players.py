@@ -2,16 +2,20 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from db.connection import get_client
 
 router = APIRouter(prefix="/api/players", tags=["players"])
-
+limiter = Limiter(key_func=get_remote_address)
 client = get_client()
 
 
 @router.get("/search")
+@limiter.limit("30/minute")
 def search_players(
+    request: Request,
     q: str = Query(..., min_length=2),
     season: int = Query(None),
     limit: int = Query(20, ge=1, le=100),
