@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Georgia Tech navy dark theme */
+    --background: 214 60% 4%;        /* #020c1b — near-black navy */
+    --foreground: 210 30% 92%;       /* off-white */
+
+    --card: 214 55% 8%;              /* #071828 — dark navy card */
+    --card-foreground: 210 30% 92%;
+
+    --popover: 214 55% 8%;
+    --popover-foreground: 210 30% 92%;
+
+    --primary: 44 95% 50%;           /* Georgia Tech gold #EAA800 */
+    --primary-foreground: 214 60% 6%;
+
+    --secondary: 214 40% 14%;        /* mid navy */
+    --secondary-foreground: 210 30% 92%;
+
+    --muted: 214 40% 12%;
+    --muted-foreground: 214 20% 55%;
+
+    --accent: 214 40% 16%;
+    --accent-foreground: 210 30% 92%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214 35% 18%;
+    --input: 214 35% 16%;
+    --ring: 44 95% 50%;              /* gold focus ring */
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

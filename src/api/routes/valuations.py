@@ -44,6 +44,29 @@ def list_valuations(
         .execute()
         .data or []
     )
+
+    # Attach best public valuation per player (max nil_value across sources)
+    if rows:
+        player_ids = [r["player_id"] for r in rows]
+        pub_rows = (
+            client.table("public_valuations")
+            .select("player_id,nil_value,source")
+            .eq("season", season)
+            .in_("player_id", player_ids)
+            .execute()
+            .data or []
+        )
+        # Keep highest public value per player
+        pub_map: dict[int, dict] = {}
+        for p in pub_rows:
+            pid = p["player_id"]
+            if pid not in pub_map or p["nil_value"] > pub_map[pid]["nil_value"]:
+                pub_map[pid] = p
+        for row in rows:
+            pub = pub_map.get(row["player_id"])
+            row["public_nil_value"] = pub["nil_value"] if pub else None
+            row["public_source"]    = pub["source"]    if pub else None
+
     return {"data": rows, "limit": limit, "offset": offset, "season": season}
 
 

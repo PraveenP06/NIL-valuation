@@ -47,7 +47,22 @@ def get_player_valuation(request: Request, player_id: int, season: int = Query(2
     )
     if not rows:
         raise HTTPException(status_code=404, detail="Player valuation not found")
-    return rows[0]
+
+    result = rows[0]
+
+    # Attach all public valuations for this player (sorted by nil_value desc)
+    pub_rows = (
+        client.table("public_valuations")
+        .select("nil_value,source,scraped_at")
+        .eq("player_id", player_id)
+        .eq("season", season)
+        .order("nil_value", desc=True)
+        .execute()
+        .data or []
+    )
+    result["public_valuations"] = pub_rows
+
+    return result
 
 
 @router.get("/{player_id}")
