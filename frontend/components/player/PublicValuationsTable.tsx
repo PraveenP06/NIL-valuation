@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { formatNilValue, formatSourceLabel } from "@/lib/format";
 import type { PublicValuationEntry } from "@/lib/types";
 
@@ -17,31 +17,43 @@ export function PublicValuationsTable({ entries }: Props) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="rounded-xl border bg-card overflow-hidden">
+    <div className="rounded-xl border border-border/80 bg-card overflow-hidden card-glow">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-6 py-4 text-sm font-medium hover:bg-muted/50 transition-colors"
+        className="w-full flex items-center justify-between px-6 py-4 hover:bg-accent/40 transition-colors"
       >
-        <span>Public Valuations ({entries.length} source{entries.length !== 1 ? "s" : ""})</span>
-        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        <div className="flex items-center gap-2">
+          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">
+            Public Valuations
+          </span>
+          <span className="rounded-full bg-primary/15 text-primary text-xs font-medium px-2 py-0.5">
+            {entries.length}
+          </span>
+        </div>
+        {open
+          ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
       </button>
 
       {open && (
-        <div className="border-t">
+        <div className="border-t border-border/60">
           <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="px-6 py-2 text-left text-muted-foreground font-medium">Source</th>
-                <th className="px-6 py-2 text-right text-muted-foreground font-medium">Value</th>
-                <th className="px-6 py-2 text-right text-muted-foreground font-medium hidden sm:table-cell">Date</th>
+            <thead>
+              <tr className="bg-muted/30">
+                <th className="px-6 py-2.5 text-left text-xs text-muted-foreground font-medium uppercase tracking-wider">Source</th>
+                <th className="px-6 py-2.5 text-right text-xs text-muted-foreground font-medium uppercase tracking-wider">Value</th>
+                <th className="px-6 py-2.5 text-right text-xs text-muted-foreground font-medium uppercase tracking-wider hidden sm:table-cell">Date</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/50">
               {entries.map((e, i) => (
-                <tr key={i} className="border-t">
-                  <td className="px-6 py-2">{formatSourceLabel(e.source)}</td>
-                  <td className="px-6 py-2 text-right font-mono font-medium">{formatNilValue(e.nil_value)}</td>
-                  <td className="px-6 py-2 text-right text-muted-foreground hidden sm:table-cell">
+                <tr key={i} className="hover:bg-accent/30 transition-colors">
+                  <td className="px-6 py-3 text-muted-foreground">{formatSourceLabel(e.source)}</td>
+                  <td className="px-6 py-3 text-right font-mono font-semibold text-amber-400 tabular-nums">
+                    {formatNilValue(e.nil_value)}
+                  </td>
+                  <td className="px-6 py-3 text-right text-xs text-muted-foreground hidden sm:table-cell">
                     {dateFmt.format(new Date(e.scraped_at))}
                   </td>
                 </tr>

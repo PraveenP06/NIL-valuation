@@ -13,8 +13,8 @@ export function ComparisonIndicator({ ourValue, publicValue, size = "sm" }: Prop
   const { delta, direction } = comparisonDelta(ourValue, publicValue);
 
   const isGreen = direction === "above" || direction === "match";
-  const dotClass = isGreen ? "bg-emerald-500" : "bg-rose-500";
-  const textClass = isGreen ? "text-emerald-700" : "text-rose-700";
+  const dotClass = isGreen ? "bg-emerald-400" : "bg-rose-400";
+  const textClass = isGreen ? "text-emerald-400" : "text-rose-400";
   const arrow = direction === "above" ? "↑" : direction === "below" ? "↓" : "≈";
   const label =
     direction === "match"
@@ -24,15 +24,15 @@ export function ComparisonIndicator({ ourValue, publicValue, size = "sm" }: Prop
   if (size === "md") {
     return (
       <div className={`flex items-center gap-2 ${textClass}`}>
-        <span className={`inline-block h-3 w-3 rounded-full ${dotClass}`} />
+        <span className={`inline-block h-2.5 w-2.5 rounded-full ${dotClass}`} />
         <span className="text-sm font-medium">{label}</span>
       </div>
     );
   }
 
   return (
-    <div className={`flex items-center gap-1 ${textClass}`}>
-      <span className={`inline-block h-2 w-2 rounded-full ${dotClass}`} />
+    <div className={`flex items-center gap-1.5 ${textClass}`}>
+      <span className={`inline-block h-2 w-2 rounded-full ${dotClass} shrink-0`} />
       <span className="text-xs whitespace-nowrap">{label}</span>
     </div>
   );

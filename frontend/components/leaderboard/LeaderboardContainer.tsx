@@ -29,31 +29,49 @@ export function LeaderboardContainer() {
   const { data, isLoading, isError, error, refetch } = useValuations(filters);
   const { data: meta, isLoading: metaLoading } = useFilterMeta(filters.season);
   const { data: stats } = useStats(filters.season);
-  // filters.season drives everything — 2025 is default
 
   const players = data?.data ?? [];
   const hasMore = players.length === filters.limit;
 
   return (
-    <div className="container py-8 space-y-6">
+    <div className="container py-8 space-y-8">
+      {/* Hero */}
+      <div className="space-y-1">
+        <div className="flex items-baseline gap-3">
+          <h1 className="font-display text-4xl font-bold tracking-wide text-foreground">
+            NIL <span className="text-primary gold-glow">Leaderboard</span>
+          </h1>
+          <span className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+            2025 Season
+          </span>
+        </div>
+        <p className="text-muted-foreground text-sm max-w-xl">
+          Model-driven NIL valuations for college football players. Factors include performance, social following, school prestige, recruiting pedigree, and collective value.
+        </p>
+      </div>
+
       {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard
-          label="Total Players"
+          label="Players"
           value={stats?.players_count?.toLocaleString() ?? "—"}
-          subLabel={`${filters.season} season`}
+          subLabel="in database"
         />
         <StatCard
           label="Valuations"
           value={stats?.valuations_count?.toLocaleString() ?? "—"}
+          subLabel={`${filters.season} season`}
         />
         <StatCard
           label="Top NIL Value"
           value={formatNilValue(stats?.top_nil_value ?? null)}
+          subLabel="this season"
+          highlight
         />
         <StatCard
           label="With Social Data"
           value={stats?.social_data_count?.toLocaleString() ?? "—"}
+          subLabel="players tracked"
         />
       </div>
 
