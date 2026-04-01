@@ -634,6 +634,7 @@ def main():
         soc_raw     = fvec[1]   # social_score (0-100)
         no_meaningful_stats = perf_val < 5
         social_star = soc_raw >= 77  # ≈ 80K+ confirmed followers
+        no_social   = soc_raw < 5   # NULL/missing social data (not scraped or truly absent)
         collective_val   = res.get("collective_score", 10.0)
         is_elite_program = collective_val >= 65   # Alabama, Georgia, Michigan, LSU, Texas, USC, Miami, etc.
         pos = (player.position or "").upper()
@@ -641,6 +642,13 @@ def main():
             nil_value = min(nil_value, 1_500_000)
         elif composite < 55:
             nil_value = min(nil_value, 3_000_000)
+        # Players with no social data have no brand presence — a sponsor can't activate them.
+        # Even elite stats don't translate to NIL deals without any social following.
+        if no_social:
+            if pos in ("QB",):
+                nil_value = min(nil_value, 800_000)
+            else:
+                nil_value = min(nil_value, 500_000)
         # Extra cap for no-stats players (walk-ons/non-contributors) without top recruit status
         if perf_val == 0 and recruit_val < 60:
             nil_value = min(nil_value, 2_000_000)
@@ -664,32 +672,40 @@ def main():
         # Stat-percentile graduated ceilings for non-QB positions.
         # Social stars get higher tier caps (brand boosts their value) but are NOT fully exempt.
         # sp == 0 (no stats record) is handled by the no_meaningful_stats caps below.
+        # Stat-percentile caps are school-quality-adjusted.
+        # The same stat line at Alabama is worth more than at Rutgers:
+        # elite programs get national TV exposure, top competition, and larger fan bases.
+        # is_elite_program (collective_val >= 65) is the gate.
         if sp > 0 and pos in ("RB", "FB"):
             if social_star:
-                if sp <= 25:   nil_value = min(nil_value,   600_000)
-                elif sp <= 55: nil_value = min(nil_value,   900_000)
-                elif sp <= 75: nil_value = min(nil_value, 1_200_000)
-                elif sp <= 89: nil_value = min(nil_value, 1_500_000)
-                # sp >= 90: elite social + elite stats — full RB ceiling ($2.5M)
+                if sp <= 25:   nil_value = min(nil_value,   600_000 if is_elite_program else   400_000)
+                elif sp <= 55: nil_value = min(nil_value,   900_000 if is_elite_program else   600_000)
+                elif sp <= 75: nil_value = min(nil_value, 1_200_000 if is_elite_program else   800_000)
+                elif sp <= 89: nil_value = min(nil_value, 1_500_000 if is_elite_program else 1_000_000)
+                # sp >= 90: elite social + elite stats — full RB ceiling ($2.5M elite, $1.5M non-elite)
+                else:          nil_value = min(nil_value, 2_500_000 if is_elite_program else 1_500_000)
             else:
-                if sp <= 25:   nil_value = min(nil_value,   400_000)
-                elif sp <= 55: nil_value = min(nil_value,   600_000)
-                elif sp <= 75: nil_value = min(nil_value,   800_000)
-                elif sp <= 89: nil_value = min(nil_value, 1_100_000)
-                # sp >= 90: elite — full RB ceiling ($2.5M)
+                if sp <= 25:   nil_value = min(nil_value,   400_000 if is_elite_program else   250_000)
+                elif sp <= 55: nil_value = min(nil_value,   600_000 if is_elite_program else   375_000)
+                elif sp <= 75: nil_value = min(nil_value,   800_000 if is_elite_program else   500_000)
+                elif sp <= 89: nil_value = min(nil_value, 1_100_000 if is_elite_program else   700_000)
+                # sp >= 90: elite stats — full RB ceiling ($2.5M elite, $1.3M non-elite)
+                else:          nil_value = min(nil_value, 2_500_000 if is_elite_program else 1_300_000)
         elif sp > 0 and pos in ("WR", "TE", "SLOT"):
             if social_star:
-                if sp <= 25:   nil_value = min(nil_value,   700_000)
-                elif sp <= 55: nil_value = min(nil_value, 1_100_000)
-                elif sp <= 75: nil_value = min(nil_value, 1_500_000)
-                elif sp <= 89: nil_value = min(nil_value, 2_000_000)
-                # sp >= 90: elite — full WR ceiling ($4M)
+                if sp <= 25:   nil_value = min(nil_value,   700_000 if is_elite_program else   450_000)
+                elif sp <= 55: nil_value = min(nil_value, 1_100_000 if is_elite_program else   700_000)
+                elif sp <= 75: nil_value = min(nil_value, 1_500_000 if is_elite_program else   950_000)
+                elif sp <= 89: nil_value = min(nil_value, 2_000_000 if is_elite_program else 1_300_000)
+                # sp >= 90: elite — full WR ceiling ($4M elite, $2M non-elite)
+                else:          nil_value = min(nil_value, 4_000_000 if is_elite_program else 2_000_000)
             else:
-                if sp <= 25:   nil_value = min(nil_value,   450_000)
-                elif sp <= 55: nil_value = min(nil_value,   700_000)
-                elif sp <= 75: nil_value = min(nil_value, 1_000_000)
-                elif sp <= 89: nil_value = min(nil_value, 1_400_000)
-                # sp >= 90: elite — full WR ceiling ($4M)
+                if sp <= 25:   nil_value = min(nil_value,   450_000 if is_elite_program else   275_000)
+                elif sp <= 55: nil_value = min(nil_value,   700_000 if is_elite_program else   425_000)
+                elif sp <= 75: nil_value = min(nil_value, 1_000_000 if is_elite_program else   625_000)
+                elif sp <= 89: nil_value = min(nil_value, 1_400_000 if is_elite_program else   875_000)
+                # sp >= 90: elite — full WR ceiling ($4M elite, $1.8M non-elite)
+                else:          nil_value = min(nil_value, 4_000_000 if is_elite_program else 1_800_000)
         # Non-skill positions: sp is always 0 for defensive/OL players (not in _SKILL_POSITIONS),
         # so use perf_val > 0 (has any stats record) as the "has production" gate instead.
         elif not no_meaningful_stats and pos in ("OT", "OG", "OL", "C"):
