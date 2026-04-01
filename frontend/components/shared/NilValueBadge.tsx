@@ -12,9 +12,9 @@ export function NilValueBadge({ value, size = "sm", highlight = false }: Props) 
   return (
     <span
       className={cn(
-        "font-mono font-semibold tabular-nums",
-        size === "lg" ? "text-3xl font-bold" : "text-sm",
-        highlight ? "text-emerald-700" : "text-foreground"
+        "font-mono tabular-nums font-semibold",
+        size === "lg" ? "text-3xl font-bold font-display text-primary gold-glow" : "text-sm",
+        !highlight && size !== "lg" && "text-amber-400"
       )}
     >
       {formatNilValue(value)}

@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 export default function SearchPage() {
   return (
     <div className="container py-8 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">Search Players</h1>
+      <div className="space-y-1 mb-6">
+        <h1 className="font-display text-4xl font-bold tracking-wide">
+          Player <span className="text-primary gold-glow">Search</span>
+        </h1>
+        <p className="text-sm text-muted-foreground">Find any CFB player and view their model NIL valuation.</p>
+      </div>
       <SearchContainer />
     </div>
   );
