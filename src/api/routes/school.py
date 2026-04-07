@@ -15,12 +15,14 @@ client = get_client()
 def get_school_top(
     request: Request,
     school: str,
-    season: int = Query(2024),
+    season: int = Query(2025),
     limit: int = Query(25, ge=1, le=100),
 ):
     rows = (
         client.table("valuations_with_players")
-        .select("player_id,nil_value,name,position,school,conference,class_year")
+        .select("player_id,season,nil_value,perf_score,social_score,school_score,"
+                "class_score,recruit_score,collective_score,position_mult,conference_mult,"
+                "name,position,school,conference,class_year")
         .eq("season", season)
         .eq("school", school)
         .order("nil_value", desc=True)

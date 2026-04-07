@@ -28,27 +28,19 @@ export default async function SchoolPage({ params }: Props) {
     throw e;
   }
 
-  // Adapt SchoolPlayer → LeaderboardPlayer (fill nulls for fields not in school response)
   const players: LeaderboardPlayer[] = data.data.map((p) => ({
     ...p,
-    season: data.season,
-    perf_score: null,
-    social_score: null,
-    school_score: null,
-    class_score: null,
-    recruit_score: null,
-    collective_score: null,
-    position_mult: null,
-    conference_mult: null,
     public_nil_value: null,
     public_source: null,
   }));
 
   return (
     <div className="container py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{school}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+      <div className="space-y-1">
+        <h1 className="font-display text-4xl font-bold tracking-wide">
+          <span className="text-primary gold-glow">{school}</span>
+        </h1>
+        <p className="text-muted-foreground text-sm">
           Top {players.length} players by NIL value · {data.season} season
         </p>
       </div>

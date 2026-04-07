@@ -54,3 +54,9 @@ data/*.pkl
 data/all_players_features.csv
 data/nil_predictions.csv
 data/nil_predictions_calibrated.csv
+
+# Planning / presentation docs
+PRESENTATION.md
+SPRINT_PLAN.md
+ROADMAP.md
+plans/

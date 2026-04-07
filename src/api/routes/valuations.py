@@ -16,7 +16,7 @@ VIEW = "valuations_with_players"
 @limiter.limit("60/minute")
 def list_valuations(
     request: Request,
-    season: int = Query(2024),
+    season: int = Query(2025),
     position: str = Query(None),
     conference: str = Query(None),
     class_year: int = Query(None),
@@ -74,7 +74,7 @@ def list_valuations(
 @limiter.limit("60/minute")
 def top_valuations(
     request: Request,
-    season: int = Query(2024),
+    season: int = Query(2025),
     limit: int = Query(25, ge=1, le=200),
 ):
     rows = (
@@ -91,7 +91,7 @@ def top_valuations(
 
 @router.get("/{player_id}")
 @limiter.limit("60/minute")
-def get_valuation(request: Request, player_id: int, season: int = Query(2024)):
+def get_valuation(request: Request, player_id: int, season: int = Query(2025)):
     rows = (
         client.table(VIEW)
         .select("player_id,season,nil_value,perf_score,social_score,school_score,"
