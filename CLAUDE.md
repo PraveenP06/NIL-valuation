@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **NEVER commit anything unless explicitly asked.** Do not run `git commit` under any circumstance unless the user directly says to commit.
 - **Always ask for confirmation before moving to the next step.** After completing any task or phase, stop and wait for approval before continuing.
+- **Do not make ANY changes until you have 95% confidence in what you need to build** Don't make changes until you are confident. Ask for follow-ups until you reach that confidence. 
 
 ## Security Rules (Always Enforce)
 

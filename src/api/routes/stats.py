@@ -14,43 +14,20 @@ client = get_client()
 @router.get("")
 @limiter.limit("30/minute")
 def get_stats(request: Request, season: int = Query(2025)):
-    players_count = (
-        client.table("players")
-        .select("id", count="exact")
-        .eq("season", season)
-        .execute()
-        .count
-    ) or 0
-
-    valuations_count = (
-        client.table("valuations")
-        .select("player_id", count="exact")
-        .eq("season", season)
-        .execute()
-        .count
-    ) or 0
-
-    social_count = (
-        client.table("social_media")
-        .select("player_id", count="exact")
-        .execute()
-        .count
-    ) or 0
-
-    top = (
-        client.table("valuations")
-        .select("nil_value")
-        .eq("season", season)
-        .order("nil_value", desc=True)
-        .limit(1)
-        .execute()
-        .data
-    )
-
+    row = client.rpc("get_season_stats", {"p_season": season}).execute().data
+    if not row:
+        return {
+            "season": season,
+            "players_count": 0,
+            "valuations_count": 0,
+            "social_data_count": 0,
+            "top_nil_value": None,
+        }
+    r = row[0]
     return {
         "season": season,
-        "players_count": players_count,
-        "valuations_count": valuations_count,
-        "social_data_count": social_count,
-        "top_nil_value": top[0]["nil_value"] if top else None,
+        "players_count": r["players_count"],
+        "valuations_count": r["valuations_count"],
+        "social_data_count": r["social_data_count"],
+        "top_nil_value": r["top_nil_value"],
     }

@@ -50,12 +50,11 @@ def get_player_valuation(request: Request, player_id: int, season: int = Query(2
 
     result = rows[0]
 
-    # Attach all public valuations for this player (sorted by nil_value desc)
+    # Attach all public valuations for this player (any season — deals persist across seasons)
     pub_rows = (
         client.table("public_valuations")
         .select("nil_value,source,scraped_at")
         .eq("player_id", player_id)
-        .eq("season", season)
         .order("nil_value", desc=True)
         .execute()
         .data or []
