@@ -54,3 +54,6 @@ data/*.pkl
 data/all_players_features.csv
 data/nil_predictions.csv
 data/nil_predictions_calibrated.csv
+
+# Presentation doc
+PRESENTATION.md

@@ -79,20 +79,10 @@ export type SearchResponse = {
 };
 
 // ─── School ───────────────────────────────────────────────────────────────────
-export type SchoolPlayer = {
-  player_id: PlayerId;
-  nil_value: NilDollars;
-  name: string;
-  position: string | null;
-  school: string | null;
-  conference: string | null;
-  class_year: number | null;
-};
-
 export type SchoolTopResponse = {
   school: string;
   season: Season;
-  data: SchoolPlayer[];
+  data: Omit<LeaderboardPlayer, "public_nil_value" | "public_source">[];
 };
 
 // ─── Filters ──────────────────────────────────────────────────────────────────

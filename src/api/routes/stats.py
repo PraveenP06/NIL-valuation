@@ -2,7 +2,8 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
+from api.limiter import limiter
 from db.connection import get_client
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
@@ -11,7 +12,8 @@ client = get_client()
 
 
 @router.get("")
-def get_stats(season: int = Query(2024)):
+@limiter.limit("30/minute")
+def get_stats(request: Request, season: int = Query(2025)):
     players_count = (
         client.table("players")
         .select("id", count="exact")
