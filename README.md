@@ -146,8 +146,14 @@ Ridge/Huber regression in log-space on a 13-feature vector. Trained on 48 curate
 
 ## Deployment
 
-- **API:** [Render](https://render.com) — `render.yaml` included
-- **Frontend:** [Vercel](https://vercel.com) — set root to `frontend/`, add `NEXT_PUBLIC_API_URL`
+- **API:** Vercel — create a project with the repository root as its Root Directory. Set
+  `DATABASE_URL`, `DATABASE_API_KEY`, and `FRONTEND_ORIGIN` in its environment variables.
+- **Frontend:** Vercel — create a second project from the same repository with `frontend/`
+  as its Root Directory. Set `NEXT_PUBLIC_API_URL` to the deployed API URL before building.
+
+The root `requirements.txt` contains only API runtime packages so the Vercel Function stays
+small. For local ingestion and model-training scripts, also install
+`requirements-ingestion.txt`.
 
 ---
 

@@ -1,0 +1,14 @@
+# Extra dependencies used by local data-ingestion and model-training scripts.
+# Install with: pip install -r requirements.txt -r requirements-ingestion.txt
+apify-client
+duckduckgo-search
+instaloader
+scikit-learn
+scipy
+numpy==2.4.2
+pandas==3.0.1
+playwright
+psycopg2-binary==2.9.11
+requests==2.32.5
+SQLAlchemy==2.0.47
+tqdm
