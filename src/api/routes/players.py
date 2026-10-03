@@ -69,7 +69,7 @@ def get_player_valuation(request: Request, player_id: int, season: int = Query(2
 def get_player(request: Request, player_id: int):
     rows = (
         client.table("players")
-        .select("*")
+        .select("id,name,position,school,conference,class_year,season")
         .eq("id", player_id)
         .limit(1)
         .execute()
